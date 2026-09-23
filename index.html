@@ -406,7 +406,7 @@
 
       <div ref="{{ popBoxRef }}" style="opacity: {{ boxOpacity }}; position: absolute; top: {{ boxTBv }}; bottom: {{ boxTBv }}; left: {{ boxLRv }}; right: {{ boxLRv }}; z-index: 2; transition: opacity 0.45s ease, transform 0.8s cubic-bezier(0.16,1,0.3,1), top 0.7s cubic-bezier(0.16,1,0.3,1), bottom 0.7s cubic-bezier(0.16,1,0.3,1), left 0.7s cubic-bezier(0.16,1,0.3,1), right 0.7s cubic-bezier(0.16,1,0.3,1); overflow: hidden; container-type: inline-size; background: #000000; box-shadow: 0 40px 120px rgba(0,0,0,0.6); transform: scale({{ boxScale }});">
         <sc-if value="{{ popupIsMux }}" hint-placeholder-val="{{ false }}">
-          <video ref="{{ popupFrameRef }}" key="{{ popupKey }}" data-hq="1" data-mux="{{ popupMux }}" data-muted="0" playsInline="{{ true }}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: {{ popupFit }}; transform: scale({{ popupFill }}); background: #000000; pointer-events: none;"></video>
+          <video ref="{{ popupFrameRef }}" key="{{ popupKey }}" data-hq="1" data-mux="{{ popupMux }}" data-muted="0" data-inline="{{ popupInlineAttr }}" playsInline="{{ popupInline }}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: {{ popupFit }}; transform: scale({{ popupFill }}); background: #000000; pointer-events: none;"></video>
         </sc-if>
         <sc-if value="{{ popupIsYt }}" hint-placeholder-val="{{ true }}">
         <iframe referrerPolicy="strict-origin-when-cross-origin" ref="{{ popupFrameRef }}" key="{{ popupKey }}" src="{{ popupSrc }}" title="{{ popupTitle }}" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowFullScreen="{{ true }}" frameBorder="0" onMouseEnter="{{ ytFrameEnter }}" onMouseLeave="{{ ytFrameLeave }}" style="position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #000000; pointer-events: {{ popFramePE }}; cursor: auto;"></iframe>
@@ -517,7 +517,7 @@ const isYT = (vid) => typeof vid === "string" && vid.indexOf("yt:") === 0;
 const ytOf = (vid) => (isYT(vid) ? vid.slice(3) : "");
 function ytSrc(vid, o) {
   const id = ytOf(vid);
-  const q = ["autoplay=1", "mute=" + (o.muted ? 1 : 0), "controls=" + (o.controls ? 1 : 0), "rel=0", "modestbranding=1", "playsinline=1", "iv_load_policy=3", "disablekb=1", "fs=0", "enablejsapi=1"];
+  const q = ["autoplay=1", "mute=" + (o.muted ? 1 : 0), "controls=" + (o.controls ? 1 : 0), "rel=0", "modestbranding=1", "playsinline=" + (o.fs ? 0 : 1), "iv_load_policy=3", "disablekb=1", "fs=" + (o.fs ? 1 : 0), "enablejsapi=1"];
   if (/^https?:/.test(location.origin || "")) q.push("origin=" + encodeURIComponent(location.origin), "widget_referrer=" + encodeURIComponent(location.origin));
   if (o.loop) q.push("loop=1", "playlist=" + id);
   if (o.start) q.push("start=" + Math.floor(o.start));
@@ -1022,6 +1022,20 @@ class Component extends DCLogic {
         }
       }, 150);
     }, 5500);
+  }
+
+  mobileFs() {
+    const el = this.popupFrameRef.current;
+    if (!el) return;
+    const done = () => { if (this.state.popup) this.closePopup(); };
+    if (!el._fsBound) {
+      el._fsBound = true;
+      el.addEventListener("webkitendfullscreen", done);
+      document.addEventListener("fullscreenchange", function onFs() { if (!document.fullscreenElement) { document.removeEventListener("fullscreenchange", onFs); done(); } });
+    }
+    const req = el.requestFullscreen || el.webkitRequestFullscreen;
+    if (req) { try { const p = req.call(el); if (p && p.catch) p.catch(() => { if (el.webkitEnterFullscreen) try { el.webkitEnterFullscreen(); } catch (e) {} }); return; } catch (e) {} }
+    if (el.webkitEnterFullscreen) { const go = () => { try { el.webkitEnterFullscreen(); } catch (e) {} }; if (el.readyState >= 1) go(); else el.addEventListener("loadedmetadata", go, { once: true }); }
   }
 
   ytLineRef = (el) => { this._ytEl = el; if (el) this.paintYtLine(); };
@@ -1612,6 +1626,7 @@ class Component extends DCLogic {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
+    if (this._narrow && this.state.popup && (!prevState || !prevState.popup || prevState.popup.vid !== this.state.popup.vid)) this.mobileFs();
     if (prevState && prevState.plays !== this.state.plays) this.paintYtLine();
     this.attachMux();
     const s = this.state, p = prevState || {};
@@ -1912,7 +1927,7 @@ class Component extends DCLogic {
       if (v._hls) { v._hls.destroy(); v._hls = null; }
       v.muted = v.getAttribute("data-muted") !== "0";
       v.loop = v.getAttribute("data-loop") === "1";
-      v.playsInline = true;
+      v.playsInline = v.getAttribute("data-inline") !== "0";
       v.autoplay = true;
       if (v.getAttribute("data-hq") === "1") v.addEventListener("loadedmetadata", () => { if (v.videoWidth && v.videoHeight) { this._vasp = this._vasp || {}; this._vasp[id] = v.videoWidth / v.videoHeight; if (this.state.popup && this.state.popup.vid === id && !(this._asp && this._asp[id])) this.forceUpdate(); } }, { once: true });
       const startAt = v.getAttribute("data-muted") !== "0" && THUMB_AT[id] != null ? THUMB_AT[id] : 0;
@@ -2131,7 +2146,9 @@ class Component extends DCLogic {
       movePopup: () => this.showChrome(),
       popupOpen: !!pop,
       popupKey: pop ? "pop-" + pop.vid : "pop",
-      popupSrc: pop && isYT(pop.vid) ? ytSrc(pop.vid, { muted: true, controls: true }) : "",
+      popupSrc: pop && isYT(pop.vid) ? ytSrc(pop.vid, { muted: !this._narrow, controls: true, fs: !!this._narrow }) : "",
+      popupInline: !this._narrow,
+      popupInlineAttr: this._narrow ? "0" : "1",
       popupFrameRef: this.popupFrameRef,
       popFramePE: pop && isYT(pop.vid) ? "auto" : "none",
       popLayerDisplay: pop && isYT(pop.vid) ? "none" : "block",
