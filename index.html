@@ -74,7 +74,18 @@
   a { color: #f2efe9; text-decoration: none; }
   a:hover { color: #8d8880; }
   ::selection { background: #e8e2d6; color: #0a0a0b; }
-  @media (max-width: 700px) { [data-hdr] { flex-direction: column !important; align-items: center !important; justify-content: flex-start !important; gap: 14px !important; } [data-hdr-name] { justify-content: center !important; } [data-hdr-nav] { justify-content: center !important; } }
+  @media (max-width: 700px) { [data-hdr] { flex-direction: column !important; align-items: center !important; justify-content: flex-start !important; gap: 14px !important; } [data-hdr-name] { justify-content: center !important; } [data-hdr-nav] { justify-content: center !important; }
+    [data-hdr] { padding-top: calc(env(safe-area-inset-top, 0px) + 34px) !important; }
+    [data-mtop] { padding-top: calc(env(safe-area-inset-top, 0px) + 128px) !important; }
+    [data-mtop-in] { margin-top: calc(-1 * (env(safe-area-inset-top, 0px) + 128px)) !important; padding-top: calc(env(safe-area-inset-top, 0px) + 128px) !important; }
+    [data-lib-title] { text-align: center; margin-bottom: 20px !important; }
+    [data-lib-top] { flex-direction: column !important; align-items: stretch !important; row-gap: 26px !important; }
+    [data-lib-plays] { order: -1; margin-left: 0 !important; align-items: center !important; text-align: center !important; }
+    [data-tagbar] { flex: none !important; display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px !important; }
+    [data-tagbar] > button { width: 100%; text-align: center; padding: 13px 10px !important; }
+    [data-tagbar] > button:first-child, [data-tagbar] > button:last-child:nth-child(even) { grid-column: 1 / -1; }
+    [data-tagstick] { flex-wrap: nowrap !important; overflow-x: auto; scrollbar-width: none; }
+    [data-tagbar]::-webkit-scrollbar, [data-tagstick]::-webkit-scrollbar { display: none; } }
   @keyframes titleOut { 0% { opacity: 1; transform: none; filter: blur(0); } 100% { opacity: 0; transform: translateY(-10px); filter: blur(6px); } }
 @keyframes titleIn { 0% { opacity: 0; transform: translateY(14px); filter: blur(6px); } 60% { filter: blur(0); } 100% { opacity: 1; transform: none; filter: blur(0); } }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
@@ -214,18 +225,18 @@
   </sc-if>
 
   <sc-if value="{{ isArchive }}" hint-placeholder-val="{{ false }}">
-    <main style="position: relative; isolation: isolate; flex: 1; padding: 96px 28px 48px; display: grid; grid-template-columns: minmax(0, 1fr); grid-auto-rows: max-content; align-content: start; gap: 28px;">
+    <main data-mtop="1" style="position: relative; isolation: isolate; flex: 1; padding: 96px 28px 48px; display: grid; grid-template-columns: minmax(0, 1fr); grid-auto-rows: max-content; align-content: start; gap: 28px;">
       <sc-if value="{{ stickyTags }}" hint-placeholder-val="{{ false }}">
-        <div style="position: fixed; left: 0; right: 0; top: {{ stickyTop }}; z-index: 39; display: flex; flex-wrap: wrap; gap: 8px; padding: 10px clamp(16px, 5vw, 28px); background: rgba(10,10,11,0.82); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid rgba(232,226,214,0.1); opacity: {{ stickyOpacity }}; transform: translateY({{ stickyShift }}); pointer-events: {{ stickyEvents }}; transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.22,1,0.36,1);">
+        <div data-tagstick="1" style="position: fixed; left: 0; right: 0; top: {{ stickyTop }}; z-index: 39; display: flex; flex-wrap: wrap; gap: 8px; padding: 10px clamp(16px, 5vw, 28px); background: rgba(10,10,11,0.82); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid rgba(232,226,214,0.1); opacity: {{ stickyOpacity }}; transform: translateY({{ stickyShift }}); pointer-events: {{ stickyEvents }}; transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.22,1,0.36,1);">
           <sc-for list="{{ tags }}" as="t" hint-placeholder-count="5">
             <button onClick="{{ t.select }}" style="cursor: pointer; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; flex: none; white-space: nowrap; padding: 9px 14px; border: 1px solid {{ t.borderColor }}; background: {{ t.bg }}; color: {{ t.color }}; transition: all 0.25s ease;" style-hover="border-color: rgba(232,226,214,0.45); color: #f2efe9;">{{ t.label }}</button>
           </sc-for>
         </div>
       </sc-if>
       <div aria-hidden="true" style="position: absolute; inset: 0; z-index: 0; pointer-events: none;"><canvas ref="{{ liquidRef }}" style="position: sticky; top: 0; width: 100%; height: 100vh; display: block;"></canvas></div>
-      <div style="position: relative; z-index: 2; margin: -96px -28px -28px; padding: 96px 28px 28px; overflow: hidden; isolation: isolate;">
-        <h2 style="margin: 0 0 18px; font-size: clamp(28px, 4vw, 52px); line-height: 0.96; font-weight: 700; letter-spacing: -0.01em; text-transform: uppercase;">Library</h2>
-        <div style="display: flex; flex-wrap: wrap; align-items: flex-end; column-gap: 32px; row-gap: 18px; margin-bottom: 8px;">
+      <div data-mtop-in="1" style="position: relative; z-index: 2; margin: -96px -28px -28px; padding: 96px 28px 28px; overflow: hidden; isolation: isolate;">
+        <h2 data-lib-title="1" style="margin: 0 0 18px; font-size: clamp(28px, 4vw, 52px); line-height: 0.96; font-weight: 700; letter-spacing: -0.01em; text-transform: uppercase;">Library</h2>
+        <div data-lib-top="1" style="display: flex; flex-wrap: wrap; align-items: flex-end; column-gap: 32px; row-gap: 18px; margin-bottom: 8px;">
         <div data-tagbar="1" style="flex: 1 1 360px; min-width: 0; display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
           <sc-for list="{{ tags }}" as="t" hint-placeholder-count="5">
             <button onClick="{{ t.select }}" style="cursor: pointer; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; flex: none; white-space: nowrap; padding: 9px 14px; border: 1px solid {{ t.borderColor }}; background: {{ t.bg }}; color: {{ t.color }}; transition: all 0.25s ease;" style-hover="border-color: rgba(232,226,214,0.45); color: #f2efe9;">{{ t.label }}</button>
@@ -233,7 +244,7 @@
 
         </div>
         <sc-if value="{{ showPlays }}" hint-placeholder-val="{{ false }}">
-          <div ref="{{ playsRef }}" style="flex: none; margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; text-align: right; pointer-events: none;">
+          <div data-lib-plays="1" ref="{{ playsRef }}" style="flex: none; margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; text-align: right; pointer-events: none;">
             <div style="display: flex; align-items: center; gap: 8px; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 10px; line-height: 1; letter-spacing: 0.2em; text-transform: uppercase; color: #b8b2a9;">
               <span ref="{{ liveDotRef }}" style="position: relative; top: -0.5px; flex: 0 0 6px; width: 6px; height: 6px; border-radius: 50%; background: #e0463a; box-shadow: 0 0 0 0 rgba(224,70,58,0.5);"></span>
               <span>Total Live YouTube View Count:</span>
@@ -307,7 +318,7 @@
   </sc-if>
 
   <sc-if value="{{ isInfo }}" hint-placeholder-val="{{ false }}">
-    <main ref="{{ infoRef }}" onMouseMove="{{ fluidMove }}" onMouseLeave="{{ fluidLeave }}" onClick="{{ fluidClick }}" style="flex: 1; padding: 96px clamp(16px, 5vw, 28px) 64px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 56px; align-items: stretch;">
+    <main data-mtop="1" ref="{{ infoRef }}" onMouseMove="{{ fluidMove }}" onMouseLeave="{{ fluidLeave }}" onClick="{{ fluidClick }}" style="flex: 1; padding: 96px clamp(16px, 5vw, 28px) 64px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 56px; align-items: stretch;">
 
       <div style="position: relative; min-height: 100%; margin-bottom: -64px; padding-bottom: 64px;">
       <section style="position: sticky; top: 96px; height: calc(100vh - 160px); min-height: 520px; overflow: hidden; container-type: inline-size; align-self: start;">
