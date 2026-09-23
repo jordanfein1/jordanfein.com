@@ -23,6 +23,9 @@
     var v = el("video", "position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:block;");
     v.setAttribute("playsinline", ""); v.setAttribute("preload", "metadata"); v.poster = poster; v.setAttribute("aria-label", title);
     box.appendChild(v);
+    var phone = /iphone|ipod|android.*mobile/i.test(navigator.userAgent) || (window.matchMedia && matchMedia("(max-width: 700px)").matches);
+    if (phone && /iphone|ipod/i.test(navigator.userAgent)) { v.removeAttribute("playsinline"); v.removeAttribute("webkit-playsinline"); v.playsInline = false; }
+    if (phone && v.canPlayType("application/vnd.apple.mpegurl")) { v.src = "https://stream.mux.com/" + id + ".m3u8"; v._ready = true; }
 
     var big = el("button", "position:absolute;inset:0;margin:auto;width:112px;height:112px;border-radius:50%;border:1px solid rgba(242,239,233,0.8);background:rgba(10,10,11,0.25);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);color:" + CREAM + ";font-family:" + MONO + ";font-size:11px;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;transition:transform 0.4s cubic-bezier(0.22,1,0.36,1),opacity 0.4s ease,background 0.3s ease;", "Play");
     big.setAttribute("aria-label", "Play " + title);
@@ -58,14 +61,13 @@
         v._ready = true; cb();
       });
     }
-    var phone = /iphone|ipod|android.*mobile/i.test(navigator.userAgent) || (window.matchMedia && matchMedia("(max-width: 700px)").matches);
     function start() {
       if (phone) {
         if (!v._ready) { if (v.canPlayType("application/vnd.apple.mpegurl")) { v.src = "https://stream.mux.com/" + id + ".m3u8"; v._ready = true; } }
         if (v._ready) {
           started = true; v.muted = false; big.style.opacity = "0"; big.style.pointerEvents = "none";
           var pp = v.play(); if (pp && pp.catch) pp.catch(function () {});
-          try { if (v.webkitEnterFullscreen) v.webkitEnterFullscreen(); else if (v.requestFullscreen) v.requestFullscreen(); } catch (e) {}
+          try { if (v.readyState >= 1 && v.webkitEnterFullscreen && !v.webkitDisplayingFullscreen) v.webkitEnterFullscreen(); else if (!v.webkitEnterFullscreen && v.requestFullscreen) v.requestFullscreen(); } catch (e) {}
           if (window.gtag) gtag("event", "video_play", { video_title: title, video_id: id, page: "project" });
           showBar(); return;
         }
