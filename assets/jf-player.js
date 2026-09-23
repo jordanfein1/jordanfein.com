@@ -58,8 +58,20 @@
         v._ready = true; cb();
       });
     }
+    var phone = /iphone|ipod|android.*mobile/i.test(navigator.userAgent) || (window.matchMedia && matchMedia("(max-width: 700px)").matches);
     function start() {
+      if (phone) {
+        if (!v._ready) { if (v.canPlayType("application/vnd.apple.mpegurl")) { v.src = "https://stream.mux.com/" + id + ".m3u8"; v._ready = true; } }
+        if (v._ready) {
+          started = true; v.muted = false; big.style.opacity = "0"; big.style.pointerEvents = "none";
+          var pp = v.play(); if (pp && pp.catch) pp.catch(function () {});
+          try { if (v.webkitEnterFullscreen) v.webkitEnterFullscreen(); else if (v.requestFullscreen) v.requestFullscreen(); } catch (e) {}
+          if (window.gtag) gtag("event", "video_play", { video_title: title, video_id: id, page: "project" });
+          showBar(); return;
+        }
+      }
       attach(function () {
+        if (phone) { try { var rq = v.requestFullscreen || v.webkitRequestFullscreen || box.requestFullscreen; if (rq) rq.call(rq === box.requestFullscreen ? box : v); } catch (e) {} }
         started = true; v.muted = false; big.style.opacity = "0"; big.style.pointerEvents = "none";
         var p = v.play(); if (p && p.catch) p.catch(function () { v.muted = true; v.play(); });
         if (window.gtag) gtag("event", "video_play", { video_title: title, video_id: id, page: "project" });
