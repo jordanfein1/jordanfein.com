@@ -74,6 +74,7 @@
   a { color: #f2efe9; text-decoration: none; }
   a:hover { color: #8d8880; }
   ::selection { background: #e8e2d6; color: #0a0a0b; }
+  @keyframes halPulse { 0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(0.9); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.08); } }
   @media (max-width: 700px) { [data-hdr] { flex-direction: column !important; align-items: center !important; justify-content: flex-start !important; gap: 14px !important; } [data-hdr-name] { justify-content: center !important; } [data-hdr-nav] { justify-content: center !important; }
     [data-hdr] { padding-top: calc(env(safe-area-inset-top, 0px) + 51px) !important; }
     [data-mtop] { padding-top: calc(env(safe-area-inset-top, 0px) + 145px) !important; }
@@ -321,6 +322,15 @@
 
   <sc-if value="{{ isInfo }}" hint-placeholder-val="{{ false }}">
     <main data-mtop="1" ref="{{ infoRef }}" onMouseMove="{{ fluidMove }}" onMouseLeave="{{ fluidLeave }}" onClick="{{ fluidClick }}" style="flex: 1; padding: 96px clamp(16px, 5vw, 28px) 64px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 56px; align-items: stretch;">
+      <div data-nofluid="1" onClick="{{ halBgClick }}" aria-hidden="{{ halHidden }}" style="position: fixed; inset: 0; z-index: 70; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px; padding: 24px; background: radial-gradient(circle at 50% 46%, rgba(10,10,11,0.62) 0%, rgba(10,10,11,0.94) 58%, #0a0a0b 100%); opacity: {{ halOpacity }}; pointer-events: {{ halEvents }}; transition: opacity 3.5s cubic-bezier(0.4,0,0.2,1);">
+        <button onClick="{{ halClick }}" aria-label="HAL 9000" style="position: relative; width: min(44vw, 210px); aspect-ratio: 1; padding: 0; border: 0; background: none; cursor: pointer; border-radius: 50%;">
+          <img src="assets/hal9000.svg" alt="" draggable="false" style="width: 100%; height: 100%; display: block; filter: saturate(0.62) brightness(0.72) contrast(1.12) sepia(0.14);">
+          {{ halGlow }}
+          <span aria-hidden="true" style="position: absolute; inset: -1px; border-radius: 50%; background: radial-gradient(circle at 50% 50%, rgba(10,10,11,0) 36%, rgba(10,10,11,0.5) 70%, #0a0a0b 100%); pointer-events: none;"></span>
+        </button>
+        <p style="margin: 0; min-height: 1.5em; max-width: 34ch; font-family: 'Courier Prime', 'Courier New', monospace; font-size: clamp(13px, 1.5vw, 15px); line-height: 1.5; letter-spacing: 0.06em; color: #e8e2d6; text-align: center;">{{ halText }}</p>
+      </div>
+
 
       <div style="position: relative; min-height: 100%; margin-bottom: -64px; padding-bottom: 64px;">
       <section style="position: sticky; top: 96px; height: calc(100vh - 160px); min-height: 520px; overflow: hidden; container-type: inline-size; align-self: start;">
@@ -776,6 +786,30 @@ class Component extends DCLogic {
   };
 
   componentDidMount() {
+    const halWait = /[?&]hal\b/.test(location.search) ? 4000 : 100000;
+    this._halLast = Date.now();
+    this._halPoke = (e) => {
+      if (this.state.halOn) {
+        if (e.type === "keydown") { this.halHide(); return; }
+        if (e.type === "wheel") this._halScroll += Math.abs(e.deltaY || 0);
+        else if (e.type === "scroll") { const y = window.scrollY; this._halScroll += Math.abs(y - (this._halY == null ? y : this._halY)); this._halY = y; }
+        else if (e.type === "touchstart") this._halTouchY = e.touches && e.touches[0] ? e.touches[0].clientY : null;
+        else if (e.type === "touchmove" && this._halTouchY != null && e.touches && e.touches[0]) { const ty = e.touches[0].clientY; this._halScroll += Math.abs(ty - this._halTouchY); this._halTouchY = ty; }
+        if (this._halScroll > 600) this.halHide();
+        return;
+      }
+      this._halLast = Date.now();
+    };
+    ["mousemove", "pointerdown", "keydown", "scroll", "touchstart", "touchmove", "wheel"].forEach((ev) => window.addEventListener(ev, this._halPoke, { passive: true }));
+    this._halI = setInterval(() => {
+      if (this.state.view !== "info" || this.state.popup) { this._halLast = Date.now(); if (this.state.halOn) this.halHide(); return; }
+      if (!this.state.halOn && !this._halDone && Date.now() - this._halLast > halWait) {
+        this._halScroll = 0; this._halY = window.scrollY; this._halTouchY = null;
+        this.setState({ halOn: true, halText: "" }); this.track("easter_egg", { egg: "hal_shown" });
+        clearTimeout(this._halAutoT);
+        this._halAutoT = setTimeout(() => { if (this.state.halOn && !this._halTyping && !this.state.halText) this.halSpeak(true); }, 9000);
+      }
+    }, 1000);
     this._onStick = () => {
       if (!this._narrow || this.state.view !== "archive") { if (this.state.tagStuck) this.setState({ tagStuck: false }); return; }
       const bar = document.querySelector("[data-tagbar]"), nav = document.querySelector("header nav");
@@ -913,6 +947,9 @@ class Component extends DCLogic {
   }
 
   componentWillUnmount() {
+    clearInterval(this._halI); clearInterval(this._halTypeI); clearTimeout(this._halOutT);
+    ["mousemove", "pointerdown", "keydown", "scroll", "touchstart", "touchmove", "wheel"].forEach((ev) => window.removeEventListener(ev, this._halPoke));
+    clearTimeout(this._halAutoT);
     window.removeEventListener("scroll", this._onStick);
     if (this._mqN) this._mqN.removeEventListener ? this._mqN.removeEventListener("change", this._onNarrow) : this._mqN.removeListener(this._onNarrow);
     clearInterval(this._playsI);
@@ -1666,6 +1703,27 @@ class Component extends DCLogic {
     attach();
   }
 
+  halHide() {
+    clearInterval(this._halTypeI); clearTimeout(this._halOutT); clearTimeout(this._halAutoT);
+    this._halTyping = false; this._halLast = Date.now();
+    if (this.state.halOn) this._halDone = true;
+    this.setState({ halOn: false });
+    setTimeout(() => { if (!this.state.halOn) this.setState({ halText: "" }); }, 3600);
+  }
+
+  halSpeak(auto) {
+    if (this._halTyping || this.state.halText) return;
+    clearTimeout(this._halAutoT);
+    const line = "I'm sorry, Dave. I'm afraid I can't do that.";
+    this._halTyping = true; let i = 0;
+    this.track("easter_egg", { egg: auto ? "hal_auto_line" : "hal_clicked" });
+    clearInterval(this._halTypeI); clearTimeout(this._halOutT);
+    this._halTypeI = setInterval(() => {
+      i++; this.setState({ halText: line.slice(0, i) });
+      if (i >= line.length) { clearInterval(this._halTypeI); this._halTyping = false; this._halOutT = setTimeout(() => this.halHide(), 4500); }
+    }, 62);
+  }
+
   flushWatch(keep) {
     const w = this._watch;
     if (!w) return;
@@ -2308,6 +2366,13 @@ class Component extends DCLogic {
       isWork: view === "work",
       isArchive: view === "archive",
       isInfo: view === "info",
+      halOpacity: this.state.halOn ? 1 : 0,
+      halEvents: this.state.halOn ? "auto" : "none",
+      halHidden: this.state.halOn ? "false" : "true",
+      halText: this.state.halText || "",
+      halClick: (e) => { e.stopPropagation(); this.halSpeak(); },
+      halBgClick: (e) => { e.stopPropagation(); if (!this._halTyping) this.halHide(); },
+      halGlow: this._halGlowEl || (this._halGlowEl = React.createElement("span", { "aria-hidden": "true", style: { position: "absolute", left: "50%", top: "50%", width: "38%", height: "38%", transform: "translate(-50%, -50%)", borderRadius: "50%", background: "radial-gradient(circle, rgba(255,86,56,0.55) 0%, rgba(200,34,22,0.2) 45%, rgba(0,0,0,0) 72%)", mixBlendMode: "screen", animation: "halPulse 4.2s ease-in-out infinite", pointerEvents: "none" } })),
       idxOpen: !!(this.state.idxPinned || this.state.idxHoverOpen),
       idxRows: this.state.idxPinned || this.state.idxHoverOpen ? "1fr" : "0fr",
       idxOpacity: this.state.idxPinned || this.state.idxHoverOpen ? 1 : 0,
