@@ -74,6 +74,7 @@
   a { color: #f2efe9; text-decoration: none; }
   a:hover { color: #8d8880; }
   ::selection { background: #e8e2d6; color: #0a0a0b; }
+  @media (max-width: 700px) { [data-hdr] { flex-direction: column !important; align-items: center !important; justify-content: flex-start !important; gap: 14px !important; } [data-hdr-name] { justify-content: center !important; } [data-hdr-nav] { justify-content: center !important; } }
   @keyframes titleOut { 0% { opacity: 1; transform: none; filter: blur(0); } 100% { opacity: 0; transform: translateY(-10px); filter: blur(6px); } }
 @keyframes titleIn { 0% { opacity: 0; transform: translateY(14px); filter: blur(6px); } 60% { filter: blur(0); } 100% { opacity: 1; transform: none; filter: blur(0); } }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
@@ -104,12 +105,12 @@
     </div>
   </div>
 
-  <header style="position: fixed; top: 0; left: 0; right: 0; z-index: 40; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; padding: 18px clamp(16px, 5vw, 28px) 56px; background: linear-gradient(180deg, rgba(10,10,11,0.86) 0%, rgba(10,10,11,0.72) 22%, rgba(10,10,11,0.52) 42%, rgba(10,10,11,0.3) 60%, rgba(10,10,11,0.13) 76%, rgba(10,10,11,0.04) 89%, rgba(10,10,11,0) 100%); flex-wrap: wrap;">
-    <a href="#work" onClick="{{ goWork }}" onMouseEnter="{{ nameEnter }}" onMouseLeave="{{ nameLeave }}" style="display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap; margin: -18px -24px; padding: 18px 24px; color: #f2efe9;">
+  <header data-hdr="1" style="position: fixed; top: 0; left: 0; right: 0; z-index: 40; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; padding: 18px clamp(16px, 5vw, 28px) 56px; background: linear-gradient(180deg, rgba(10,10,11,0.86) 0%, rgba(10,10,11,0.72) 22%, rgba(10,10,11,0.52) 42%, rgba(10,10,11,0.3) 60%, rgba(10,10,11,0.13) 76%, rgba(10,10,11,0.04) 89%, rgba(10,10,11,0) 100%); flex-wrap: wrap;">
+    <a data-hdr-name="1" href="#work" onClick="{{ goWork }}" onMouseEnter="{{ nameEnter }}" onMouseLeave="{{ nameLeave }}" style="display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap; margin: -18px -24px; padding: 18px 24px; color: #f2efe9;">
       <span style="font-size: 16px; line-height: 0.74; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;">Jordan Fein</span>
       <span style="font-family: 'Courier Prime', 'Courier New', monospace; font-size: 11.5px; line-height: 0.64; letter-spacing: 0.18em; text-transform: uppercase; color: inherit;">Director</span>
     </a>
-    <nav style="display: flex; align-items: flex-end; gap: clamp(14px, 4vw, 24px); font-family: 'Courier Prime', 'Courier New', monospace; font-size: 11.5px; line-height: 0.64; letter-spacing: 0.2em; text-transform: uppercase;">
+    <nav data-hdr-nav="1" style="display: flex; align-items: flex-end; gap: clamp(14px, 4vw, 24px); font-family: 'Courier Prime', 'Courier New', monospace; font-size: 11.5px; line-height: 0.64; letter-spacing: 0.2em; text-transform: uppercase;">
       <a href="#work" onClick="{{ goWork }}" style="color: {{ workColor }}; padding-bottom: 0;" style-hover="color: #f2efe9;">Featured work</a>
       <a href="#archive" onClick="{{ goArchive }}" style="color: {{ archiveColor }}; padding-bottom: 0;" style-hover="color: #f2efe9;">Library</a>
       <a href="#info" onClick="{{ goInfo }}" style="color: {{ infoColor }}; padding-bottom: 0;" style-hover="color: #f2efe9;">Info</a>
