@@ -319,7 +319,7 @@
           <p data-reveal="1" style="opacity: 0; transform: translate3d(0, 34px, 0); filter: blur(8px); transition: opacity 1.1s cubic-bezier(0.22,1,0.36,1), transform 1.3s cubic-bezier(0.16,1,0.3,1), filter 1.1s ease; margin: 0;">He makes pictures that move like a freight train: cinematic, unflinching, and built to break through. He’s directed Super Bowl spots, wrangled celebrities, and creates films that feel as dynamic as they are human.</p>
           <p data-reveal="1" style="opacity: 0; transform: translate3d(0, 34px, 0); filter: blur(8px); transition: opacity 1.1s cubic-bezier(0.22,1,0.36,1), transform 1.3s cubic-bezier(0.16,1,0.3,1), filter 1.1s ease; margin: 0;">His path hasn’t exactly been ordinary.</p>
           <p data-reveal="1" style="opacity: 0; transform: translate3d(0, 34px, 0); filter: blur(8px); transition: opacity 1.1s cubic-bezier(0.22,1,0.36,1), transform 1.3s cubic-bezier(0.16,1,0.3,1), filter 1.1s ease; margin: 0;">He joined a cowboy hunting club to rage in an off-the-grid desert hideaway. Cornered Spielberg to trade storytelling nightmares. Once, he walked away from a rattlesnake bite (this time).</p>
-          <p data-reveal="1" style="opacity: 0; transform: translate3d(0, 34px, 0); filter: blur(8px); transition: opacity 1.1s cubic-bezier(0.22,1,0.36,1), transform 1.3s cubic-bezier(0.16,1,0.3,1), filter 1.1s ease; margin: 0;">That same restless curiosity fuels everything: <a href="{{ blessingHref }}" style="color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px;"><em>The Blessing</em></a>, his award-winning feature documentary that premiered on PBS, WORLD, and NHK Japan; Penn State's Super Bowl campaign; and Volvo’s “Highway Robbery,” which picked up a Clio and three Cannes Lions. His short documentary produced by People Magazine won multiple Webbys<sc-if value="{{ hasYtViews }}" hint-placeholder-val="{{ false }}">, and his YouTube films have drawn more than <strong style="color: #f2efe9; font-weight: 700;">{{ ytViews }} organic views</strong></sc-if>. Named Independent Magazine’s <em>Filmmaker to Watch</em>, Jordan was a panelist at Sundance, lectured at Harvard, and is a member of the Directors Guild of America and the National Board of Review of Motion Pictures.</p>
+          <p data-reveal="1" style="opacity: 0; transform: translate3d(0, 34px, 0); filter: blur(8px); transition: opacity 1.1s cubic-bezier(0.22,1,0.36,1), transform 1.3s cubic-bezier(0.16,1,0.3,1), filter 1.1s ease; margin: 0;">That same restless curiosity fuels everything: <a href="{{ blessingHref }}" style="color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px;"><em>The Blessing</em></a>, his award-winning feature documentary that premiered on PBS, WORLD, and NHK Japan; Penn State's Super Bowl campaign; and Volvo’s “Highway Robbery,” which picked up a Clio and three Cannes Lions. His short documentary produced by People Magazine won multiple Webbys<span data-nofluid="1"><sc-if value="{{ hasYtViews }}" hint-placeholder-val="{{ false }}">, and his YouTube films have drawn more than <strong style="color: #f2efe9; font-weight: 700;">{{ ytViews }} organic views</strong></sc-if>.</span> Named Independent Magazine’s <em>Filmmaker to Watch</em>, Jordan was a panelist at Sundance, lectured at Harvard, and is a member of the Directors Guild of America and the National Board of Review of Motion Pictures.</p>
           <p data-nofluid="1" aria-label="– End of story. For now." data-reveal="1" style="opacity: 0; transform: translate3d(0, 34px, 0); filter: blur(8px); transition: opacity 1.1s cubic-bezier(0.22,1,0.36,1), transform 1.3s cubic-bezier(0.16,1,0.3,1), filter 1.1s ease; margin: 0; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 13.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #b8b2a9; min-height: 1.6em;"><span style="color: #f2efe9; animation: {{ dashAnim }};">–</span><span>{{ storyA }}</span><span style="font-weight: {{ forNowWeight }}; color: {{ forNowColor }}; transition: color 0.4s ease;">{{ storyB }}</span><span style="display: {{ caretDisplay }}; width: 0.6em; margin-left: 2px; border-bottom: 1px solid #f2efe9; animation: caretBlink 0.9s steps(1) infinite;">&nbsp;</span></p>
         </div>
 
@@ -401,9 +401,14 @@
         </sc-if>
         <div onClick="{{ clickPopup }}" onMouseEnter="{{ enterPopup }}" onMouseMove="{{ zonePopup }}" onMouseLeave="{{ leaveCursor }}" style="position: absolute; inset: 0; display: {{ popLayerDisplay }};"></div>
 
-      <div style="position: absolute; top: 0; left: 0; right: 0; z-index: 3; display: flex; align-items: center; justify-content: space-between; padding: 18px 26px 70px; background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%); opacity: {{ chromeOpacity }}; pointer-events: {{ chromeEvents }}; transition: opacity 0.6s ease;">
+      <div style="position: absolute; top: 0; left: 0; right: 0; z-index: 3; display: flex; align-items: center; justify-content: space-between; padding: 18px 26px 70px; background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%); opacity: {{ chromeOpacity }}; pointer-events: {{ topEvents }}; transition: opacity 0.6s ease;">
         <div style="font-family: 'Courier Prime', 'Courier New', monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #8d8880;">{{ popupCounter }}</div>
+        <div style="display: flex; gap: 26px; align-items: center; pointer-events: auto;">
+        <sc-if value="{{ ytCreditsBtn }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ toggleCredits }}" style="white-space: nowrap; cursor: pointer; background: transparent; border: 0; padding: 10px 0; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: {{ creditsColor }}; transition: opacity 0.25s ease;" style-hover="opacity: 0.7;">{{ creditsLabel }}</button>
+        </sc-if>
         <button onClick="{{ closePopupBtn }}" aria-label="Close" style="cursor: pointer; background: transparent; border: 0; padding: 10px 0; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: #ffffff; transition: color 0.25s ease, opacity 0.25s ease; display: flex; gap: 10px; align-items: center;" style-hover="color: #ffffff;"><span>Close</span><span style="font-size: 18px; letter-spacing: 0;">✕</span></button>
+        </div>
       </div>
 
       <div style="position: absolute; inset: 0; z-index: 4; display: flex; align-items: center; padding: 72px 4cqw 120px; overflow-y: auto; background: rgba(4,4,5,0.74); backdrop-filter: {{ creditsBlur }}; -webkit-backdrop-filter: {{ creditsBlur }}; opacity: {{ panelOpacity }}; pointer-events: {{ creditsEvents }}; transition: opacity 0.6s ease;">
@@ -444,7 +449,6 @@
         <div style="position: relative; display: flex; justify-content: space-between; gap: 20px; align-items: center; padding-top: 8px; min-height: 40px;">
           <div style="display: flex; gap: 14px; align-items: baseline; min-width: 0; flex: 1 1 0; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase;">
             <span style="color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3; padding-bottom: 0.12em;">{{ popupTitle }}</span>
-            <span style="color: #c4beb5; white-space: nowrap;">{{ popupMeta }}</span>
           </div>
           <div style="position: absolute; left: 50%; top: 8px; transform: translateX(-50%); display: flex; gap: 18px; align-items: center; white-space: nowrap; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 12px; letter-spacing: 0.12em; color: #ffffff;">
             <button onClick="{{ togglePlay }}" aria-label="Play or pause" style="cursor: pointer; background: transparent; border: 0; padding: 10px 0; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: #ffffff; transition: color 0.25s ease, opacity 0.25s ease; width: 54px; text-align: left;" style-hover="opacity: 0.7;"><span ref="{{ playLabelRef }}">Pause</span></button>
@@ -1634,7 +1638,7 @@ class Component extends DCLogic {
     clearTimeout(this._chromeTimer);
     if (!this.state.chrome) this.setState({ chrome: true });
     this._chromeTimer = setTimeout(() => {
-      if (this.state.popup && !this.state.credits && this._playing !== false) this.setState({ chrome: false });
+      if (this.state.popup && !isYT(this.state.popup.vid) && !this.state.credits && this._playing !== false) this.setState({ chrome: false });
     }, 2600);
   }
 
@@ -2132,8 +2136,10 @@ class Component extends DCLogic {
         if (this._playing) p.pause(); else p.play().catch(() => {});
       },
       scrub: (e) => { e.stopPropagation(); const p = this._vp; if (!p) return; const r = e.currentTarget.getBoundingClientRect(); const x = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)); p.getDuration().then((d) => p.setCurrentTime(d * x)).catch(() => {}); },
-      barOpacity: this.state.chrome || popCreditsOn ? 1 : 0,
-      barEvents: this.state.chrome || popCreditsOn ? "auto" : "none",
+      barOpacity: pop && isYT(pop.vid) ? 0 : this.state.chrome || popCreditsOn ? 1 : 0,
+      barEvents: pop && isYT(pop.vid) ? "none" : this.state.chrome || popCreditsOn ? "auto" : "none",
+      topEvents: pop && isYT(pop.vid) ? "none" : this.state.chrome ? "auto" : "none",
+      ytCreditsBtn: !!(pop && isYT(pop.vid)),
       creditsEvents: popCreditsOn ? "auto" : "none",
       creditsBlur: popCreditsOn ? "blur(14px)" : "none",
       creditsShift: popCreditsOn ? "0px" : "24px",
