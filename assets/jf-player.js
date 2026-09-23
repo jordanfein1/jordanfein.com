@@ -87,7 +87,19 @@
     v.addEventListener("volumechange", function () { snd.textContent = v.muted ? "Sound on" : "Sound off"; });
     v.addEventListener("timeupdate", function () { var d = v.duration || 0; fill.style.width = d ? (v.currentTime / d * 100) + "%" : "0"; time.textContent = fmt(v.currentTime) + " / " + fmt(d); });
     v.addEventListener("progress", function () { try { var d = v.duration; if (d && v.buffered.length) buf.style.width = (v.buffered.end(v.buffered.length - 1) / d * 100) + "%"; } catch (e) {} });
-    v.addEventListener("ended", function () { play.textContent = "Replay"; });
+    v.addEventListener("ended", function () { play.textContent = "Replay"; mark(100); });
+    var wSec = 0, wLast = null, marks = {};
+    function ev(name, extra) { if (!window.gtag) return; var o = { video_title: title, video_id: id, page: "project", play_source: "project_page", video_provider: "mux" }; for (var k in extra) o[k] = extra[k]; gtag("event", name, o); }
+    function mark(p) { if (marks[p]) return; marks[p] = true; ev("video_progress", { percent: p }); }
+    v.addEventListener("timeupdate", function () {
+      var t = v.currentTime, d = v.duration || 0;
+      if (wLast != null && !v.paused) { var dt = t - wLast; if (dt > 0 && dt < 2) wSec += dt; }
+      wLast = t;
+      if (d) { [25, 50, 75].forEach(function (m) { if (t / d * 100 >= m) mark(m); }); }
+    });
+    function flush() { if (wSec < 1) return; var d = v.duration || 0; ev("video_watch_time", { watch_seconds: Math.round(wSec), video_duration: Math.round(d), percent_watched: d ? Math.min(100, Math.round(wSec / d * 100)) : 0, transport_type: "beacon" }); wSec = 0; }
+    window.addEventListener("pagehide", flush);
+    document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") flush(); });
     document.addEventListener("fullscreenchange", function () { fs.textContent = document.fullscreenElement === box ? "Exit full screen" : "Full screen"; v.style.objectFit = "contain"; });
     box.tabIndex = 0;
     box.addEventListener("keydown", function (e) { if (e.code === "Space" || e.key === "k") { e.preventDefault(); toggle(); } else if (e.key === "f") fs.onclick(e); else if (e.key === "m") snd.onclick(e); });
