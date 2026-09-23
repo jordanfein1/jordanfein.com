@@ -103,15 +103,15 @@
     </div>
   </div>
 
-  <header style="position: fixed; top: 0; left: 0; right: 0; z-index: 40; display: flex; align-items: baseline; justify-content: space-between; gap: 24px; padding: 18px clamp(16px, 5vw, 28px) 56px; background: linear-gradient(180deg, rgba(10,10,11,0.86) 0%, rgba(10,10,11,0.72) 22%, rgba(10,10,11,0.52) 42%, rgba(10,10,11,0.3) 60%, rgba(10,10,11,0.13) 76%, rgba(10,10,11,0.04) 89%, rgba(10,10,11,0) 100%); flex-wrap: wrap;">
-    <a href="#work" onClick="{{ goWork }}" onMouseEnter="{{ nameEnter }}" onMouseLeave="{{ nameLeave }}" style="display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin: -18px -24px; padding: 18px 24px; color: #f2efe9;">
-      <span style="font-size: 16px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;">Jordan Fein</span>
-      <span style="font-family: 'Courier Prime', 'Courier New', monospace; font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase; color: inherit;">Director</span>
+  <header style="position: fixed; top: 0; left: 0; right: 0; z-index: 40; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; padding: 18px clamp(16px, 5vw, 28px) 56px; background: linear-gradient(180deg, rgba(10,10,11,0.86) 0%, rgba(10,10,11,0.72) 22%, rgba(10,10,11,0.52) 42%, rgba(10,10,11,0.3) 60%, rgba(10,10,11,0.13) 76%, rgba(10,10,11,0.04) 89%, rgba(10,10,11,0) 100%); flex-wrap: wrap;">
+    <a href="#work" onClick="{{ goWork }}" onMouseEnter="{{ nameEnter }}" onMouseLeave="{{ nameLeave }}" style="display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap; margin: -18px -24px; padding: 18px 24px; color: #f2efe9;">
+      <span style="font-size: 16px; line-height: 0.74; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;">Jordan Fein</span>
+      <span style="font-family: 'Courier Prime', 'Courier New', monospace; font-size: 11.5px; line-height: 0.64; letter-spacing: 0.18em; text-transform: uppercase; color: inherit;">Director</span>
     </a>
-    <nav style="display: flex; gap: clamp(14px, 4vw, 24px); font-family: 'Courier Prime', 'Courier New', monospace; font-size: 11.5px; letter-spacing: 0.2em; text-transform: uppercase;">
-      <a href="#work" onClick="{{ goWork }}" style="color: {{ workColor }}; border-bottom: 1px solid transparent; padding-bottom: 2px;" style-hover="color: #f2efe9;">Featured work</a>
-      <a href="#archive" onClick="{{ goArchive }}" style="color: {{ archiveColor }}; padding-bottom: 2px;" style-hover="color: #f2efe9;">Library</a>
-      <a href="#info" onClick="{{ goInfo }}" style="color: {{ infoColor }}; padding-bottom: 2px;" style-hover="color: #f2efe9;">Info</a>
+    <nav style="display: flex; align-items: flex-end; gap: clamp(14px, 4vw, 24px); font-family: 'Courier Prime', 'Courier New', monospace; font-size: 11.5px; line-height: 0.64; letter-spacing: 0.2em; text-transform: uppercase;">
+      <a href="#work" onClick="{{ goWork }}" style="color: {{ workColor }}; padding-bottom: 0;" style-hover="color: #f2efe9;">Featured work</a>
+      <a href="#archive" onClick="{{ goArchive }}" style="color: {{ archiveColor }}; padding-bottom: 0;" style-hover="color: #f2efe9;">Library</a>
+      <a href="#info" onClick="{{ goInfo }}" style="color: {{ infoColor }}; padding-bottom: 0;" style-hover="color: #f2efe9;">Info</a>
     </nav>
   </header>
 
