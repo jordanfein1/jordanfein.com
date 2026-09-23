@@ -1969,7 +1969,8 @@ class Component extends DCLogic {
       const startAt = v.getAttribute("data-muted") !== "0" && THUMB_AT[id] != null ? THUMB_AT[id] : 0;
       if (startAt) v.addEventListener("loadedmetadata", () => { if (v.currentTime < 0.5 && v.duration > startAt) v.currentTime = startAt; }, { once: true });
       const hq = v.getAttribute("data-hq") === "1";
-      const url = "https://stream.mux.com/" + id + ".m3u8" + (hq ? "?min_resolution=720p&rendition_order=desc" : "");
+      const phone = /iphone|ipod|android.*mobile/i.test(navigator.userAgent) || (window.matchMedia && matchMedia("(max-width: 700px)").matches);
+      const url = "https://stream.mux.com/" + id + ".m3u8" + (hq ? (phone ? "?max_resolution=720p&rendition_order=desc" : "?min_resolution=720p&rendition_order=desc") : "");
       const go = () => {
         if (v._muxId !== id) return;
         const nativeHls = /^((?!chrome|android|crios|fxios).)*safari/i.test(navigator.userAgent) || /iphone|ipad/i.test(navigator.userAgent);
