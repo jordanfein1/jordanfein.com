@@ -66,7 +66,7 @@
 
   <section aria-label="Trailer" style="padding:0 28px;">
     <div data-rv style="position:relative;width:100%;max-width:1400px;margin:0 auto;aspect-ratio:16/9;background:#000;">
-      <iframe src="https://player.mux.com/trqeWigbiCfR52ABMhpUZlJmdeT4ela7XTWYyE8gKSw?accent-color=%23f2efe9&amp;primary-color=%23ffffff&amp;secondary-color=%230a0a0b" title="The Blessing — trailer, directed by Jordan Fein &amp; Hunter Robert Baker" loading="lazy" allow="autoplay; fullscreen; picture-in-picture; encrypted-media" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe>
+      <div data-jf-player data-mux="trqeWigbiCfR52ABMhpUZlJmdeT4ela7XTWYyE8gKSw" data-time="20" data-title="The Blessing — trailer, directed by Jordan Fein &amp; Hunter Robert Baker" style="position:absolute;inset:0;"></div>
     </div>
     <p style="margin:0;font-family:'Courier Prime','Courier New',monospace;font-size:11px;letter-spacing:0.24em;text-transform:uppercase;color:#b8b2a9;font-weight:400;max-width:1400px;margin:14px auto 0;">Trailer</p>
   </section>
@@ -163,5 +163,6 @@
 <footer style="padding:24px 28px;font-family:'Courier Prime','Courier New',monospace;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#b8b2a9;">Jordan Fein — Director · New York &amp; Los Angeles · <a href="mailto:jdfein@gmail.com">jdfein@gmail.com</a></footer>
 <script>(function(){var els=document.querySelectorAll('[data-rv]');if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in')});return;}var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}})},{rootMargin:'0px 0px -8% 0px'});els.forEach(function(e){io.observe(e)});})();</script>
 <script>(function(){if(/(^|\.)jordanfein\.com$/.test(location.hostname))return;document.querySelectorAll('a[href^="/"]').forEach(function(a){var u=a.getAttribute('href');var m=u.match(/^\/work\/([^/]+)\/?$/);a.setAttribute('href',m?'../'+m[1]+'/index.html':'../../Jordan%20Fein.dc.html'+(u.indexOf('#')>=0?u.slice(u.indexOf('#')):''));});})();</script>
+<script src="../../assets/jf-player.js" defer></script>
 </body>
 </html>
