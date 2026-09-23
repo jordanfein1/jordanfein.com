@@ -780,9 +780,17 @@ class Component extends DCLogic {
       if (!this._narrow || this.state.view !== "archive") { if (this.state.tagStuck) this.setState({ tagStuck: false }); return; }
       const bar = document.querySelector("[data-tagbar]"), nav = document.querySelector("header nav");
       if (!bar || !nav) return;
-      if (!this.state.tagScrolling) this.setState({ tagScrolling: true });
+      const now = performance.now(), y = window.scrollY;
+      if (this._lastY != null) {
+        const dt = Math.max(1, now - this._lastT), v = Math.abs(y - this._lastY) / dt;
+        this._vel = this._vel == null ? v : this._vel * 0.6 + v * 0.4;
+      }
+      this._lastY = y; this._lastT = now;
+      const fast = (this._vel || 0) > 0.45;
+      if (fast && !this.state.tagScrolling) this.setState({ tagScrolling: true });
+      else if (!fast && this.state.tagScrolling && (this._vel || 0) < 0.3) this.setState({ tagScrolling: false });
       clearTimeout(this._tagScrollT);
-      this._tagScrollT = setTimeout(() => this.setState({ tagScrolling: false }), 380);
+      this._tagScrollT = setTimeout(() => { this._vel = 0; this._lastY = null; if (this.state.tagScrolling) this.setState({ tagScrolling: false }); }, 160);
       const top = Math.round(nav.getBoundingClientRect().bottom + 6);
       const stuck = bar.getBoundingClientRect().bottom < top;
       if (stuck !== !!this.state.tagStuck || top !== this.state.stickyTop) this.setState({ tagStuck: stuck, stickyTop: top });
