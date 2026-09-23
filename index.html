@@ -59,6 +59,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js" async=""></script>
 <link rel="preconnect" href="https://stream.mux.com">
+<link rel="preconnect" href="https://image.mux.com">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin="">
+<link rel="preconnect" href="https://docs.google.com" crossorigin="">
+<link rel="preload" as="fetch" href="https://docs.google.com/spreadsheets/d/e/2PACX-1vT1yqbKhkILbavibxGP5YAQOTLZd-dOE9vFlECpHLVNG2ny4nWgfa0e3WOZon2yUCkr2DGKYmlgRIeh/pub?output=csv" crossorigin="anonymous">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <link rel="preconnect" href="https://www.youtube.com">
 <link rel="preconnect" href="https://i.ytimg.com">
@@ -99,12 +103,12 @@
     </div>
   </div>
 
-  <header style="position: fixed; top: 0; left: 0; right: 0; z-index: 40; display: flex; align-items: baseline; justify-content: space-between; gap: 24px; padding: 18px 28px 56px; background: linear-gradient(180deg, rgba(10,10,11,0.86) 0%, rgba(10,10,11,0.72) 22%, rgba(10,10,11,0.52) 42%, rgba(10,10,11,0.3) 60%, rgba(10,10,11,0.13) 76%, rgba(10,10,11,0.04) 89%, rgba(10,10,11,0) 100%); flex-wrap: wrap;">
+  <header style="position: fixed; top: 0; left: 0; right: 0; z-index: 40; display: flex; align-items: baseline; justify-content: space-between; gap: 24px; padding: 18px clamp(16px, 5vw, 28px) 56px; background: linear-gradient(180deg, rgba(10,10,11,0.86) 0%, rgba(10,10,11,0.72) 22%, rgba(10,10,11,0.52) 42%, rgba(10,10,11,0.3) 60%, rgba(10,10,11,0.13) 76%, rgba(10,10,11,0.04) 89%, rgba(10,10,11,0) 100%); flex-wrap: wrap;">
     <a href="#work" onClick="{{ goWork }}" onMouseEnter="{{ nameEnter }}" onMouseLeave="{{ nameLeave }}" style="display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin: -18px -24px; padding: 18px 24px; color: #f2efe9;">
       <span style="font-size: 16px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;">Jordan Fein</span>
       <span style="font-family: 'Courier Prime', 'Courier New', monospace; font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase; color: inherit;">Director</span>
     </a>
-    <nav style="display: flex; gap: 24px; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 11.5px; letter-spacing: 0.2em; text-transform: uppercase;">
+    <nav style="display: flex; gap: clamp(14px, 4vw, 24px); font-family: 'Courier Prime', 'Courier New', monospace; font-size: 11.5px; letter-spacing: 0.2em; text-transform: uppercase;">
       <a href="#work" onClick="{{ goWork }}" style="color: {{ workColor }}; border-bottom: 1px solid transparent; padding-bottom: 2px;" style-hover="color: #f2efe9;">Featured work</a>
       <a href="#archive" onClick="{{ goArchive }}" style="color: {{ archiveColor }}; padding-bottom: 2px;" style-hover="color: #f2efe9;">Library</a>
       <a href="#info" onClick="{{ goInfo }}" style="color: {{ infoColor }}; padding-bottom: 2px;" style-hover="color: #f2efe9;">Info</a>
@@ -114,7 +118,8 @@
   <sc-if value="{{ isWork }}" hint-placeholder-val="{{ true }}">
     <main style="flex: 1; display: flex; flex-direction: column;">
 
-      <div onMouseEnter="{{ enterPlayer }}" onMouseLeave="{{ leavePlayer }}" onMouseMove="{{ movePlayer }}" onClick="{{ playWithSound }}" style="position: relative; width: 100%; height: 100vh; min-height: 460px; background-color: #000000; overflow: hidden;">
+      <div onMouseEnter="{{ enterPlayer }}" onMouseLeave="{{ leavePlayer }}" onMouseMove="{{ movePlayer }}" onClick="{{ playWithSound }}" style="position: relative; width: 100%; height: 100svh; min-height: 460px; background-color: #000000; overflow: hidden;">
+        <div aria-hidden="true" style="position: absolute; inset: 0; background-color: #000000; background-image: {{ heroPoster }}; background-size: cover; background-position: center; transform: scale({{ heroFill }}); transition: background-image 0.2s linear;"></div>
         <sc-if value="{{ playerIsMux }}" hint-placeholder-val="{{ false }}">
           <video key="featured-slot-0" data-hq="1" data-slot="0" data-active="{{ slot0Active }}" data-mux="{{ slot0Mux }}" data-muted="{{ slot0Muted }}" data-loop="1" playsInline="{{ true }}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale({{ slot0Fill }}); background: transparent; opacity: 0; transition: opacity 1s ease;"></video>
           <video key="featured-slot-1" data-hq="1" data-slot="1" data-active="{{ slot1Active }}" data-mux="{{ slot1Mux }}" data-muted="{{ slot1Muted }}" data-loop="1" playsInline="{{ true }}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale({{ slot1Fill }}); background: transparent; opacity: 0; transition: opacity 1s ease;"></video>
@@ -125,7 +130,7 @@
         <div aria-hidden="true" style="position: absolute; inset: 0; z-index: 1; display: {{ shieldDisplay }};"></div>
 
         <sc-if value="{{ true }}" hint-placeholder-val="{{ true }}">
-          <div style="position: absolute; inset: 0; z-index: 3; display: flex; flex-direction: column; justify-content: flex-end; padding: 28px 28px 116px; background: linear-gradient(0deg, rgba(10,10,11,0.82) 0%, rgba(10,10,11,0.15) 45%, rgba(10,10,11,0.05) 100%); pointer-events: none;">
+          <div style="position: absolute; inset: 0; z-index: 3; display: flex; flex-direction: column; justify-content: flex-end; padding: 28px clamp(16px, 5vw, 28px) 116px; background: linear-gradient(0deg, rgba(10,10,11,0.82) 0%, rgba(10,10,11,0.15) 45%, rgba(10,10,11,0.05) 100%); pointer-events: none;">
             <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 28px; flex-wrap: wrap;">
               <div style="display: grid; align-items: end;">
                 <sc-if value="{{ hasPrevTitle }}" hint-placeholder-val="{{ false }}">
@@ -177,15 +182,15 @@
           </div>
         </sc-if>
 
-        <div style="position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; display: grid; grid-template-columns: repeat({{ projectCount }}, minmax(0, 1fr)); gap: 1px; padding: 0 28px 24px; background: linear-gradient(0deg, rgba(10,10,11,0.55), rgba(10,10,11,0));">
+        <div style="position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; display: grid; grid-template-columns: repeat({{ projectCount }}, minmax(0, 1fr)); gap: 1px; padding: 0 clamp(16px, 5vw, 28px) 24px; background: linear-gradient(0deg, rgba(10,10,11,0.55), rgba(10,10,11,0));">
           <sc-for list="{{ projects }}" as="p" hint-placeholder-count="6">
-            <button onClick="{{ p.select }}" onMouseEnter="{{ p.enter }}" style="cursor: pointer; text-align: left; background: transparent; border: 0; padding: 12px 10px 0 0; display: flex; flex-direction: column; gap: 9px; opacity: {{ p.opacity }}; transition: opacity 0.4s ease;" style-hover="opacity: 1;">
+            <button onClick="{{ p.select }}" onMouseEnter="{{ p.enter }}" style="cursor: pointer; text-align: left; background: transparent; border: 0; padding: 12px 10px 8px 0; min-height: 44px; display: flex; flex-direction: column; gap: 9px; opacity: {{ p.opacity }}; transition: opacity 0.4s ease;" style-hover="opacity: 1;">
               <div style="position: relative; width: 100%; height: 1px; background: rgba(232,226,214,0.16);">
                 <div key="{{ p.barKey }}" style="position: absolute; left: 0; top: 0; height: 1px; width: 100%; transform-origin: left; background: {{ p.barColor }}; animation: barIn {{ p.barDuration }} linear both;"></div>
               </div>
               <div style="display: flex; gap: 8px; align-items: baseline; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: {{ p.labelColor }};">
                 <span style="color: {{ p.numColor }};">{{ p.num }}</span>
-                <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.3; padding-bottom: 0.12em;">{{ p.title }}</span>
+                <sc-if value="{{ p.showTitle }}" hint-placeholder-val="{{ true }}"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.3; padding-bottom: 0.12em;">{{ p.title }}</span></sc-if>
               </div>
             </button>
           </sc-for>
@@ -208,13 +213,20 @@
 
   <sc-if value="{{ isArchive }}" hint-placeholder-val="{{ false }}">
     <main style="position: relative; isolation: isolate; flex: 1; padding: 96px 28px 48px; display: grid; grid-template-columns: minmax(0, 1fr); grid-auto-rows: max-content; align-content: start; gap: 28px;">
+      <sc-if value="{{ stickyTags }}" hint-placeholder-val="{{ false }}">
+        <div style="position: fixed; left: 0; right: 0; top: {{ stickyTop }}; z-index: 39; display: flex; flex-wrap: wrap; gap: 8px; padding: 10px clamp(16px, 5vw, 28px); background: rgba(10,10,11,0.82); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid rgba(232,226,214,0.1); opacity: {{ stickyOpacity }}; transform: translateY({{ stickyShift }}); pointer-events: {{ stickyEvents }}; transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.22,1,0.36,1);">
+          <sc-for list="{{ tags }}" as="t" hint-placeholder-count="5">
+            <button onClick="{{ t.select }}" style="cursor: pointer; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; flex: none; white-space: nowrap; padding: 9px 14px; border: 1px solid {{ t.borderColor }}; background: {{ t.bg }}; color: {{ t.color }}; transition: all 0.25s ease;" style-hover="border-color: rgba(232,226,214,0.45); color: #f2efe9;">{{ t.label }}</button>
+          </sc-for>
+        </div>
+      </sc-if>
       <div aria-hidden="true" style="position: absolute; inset: 0; z-index: 0; pointer-events: none;"><canvas ref="{{ liquidRef }}" style="position: sticky; top: 0; width: 100%; height: 100vh; display: block;"></canvas></div>
       <div style="position: relative; z-index: 2; margin: -96px -28px -28px; padding: 96px 28px 28px; overflow: hidden; isolation: isolate;">
         <h2 style="margin: 0 0 18px; font-size: clamp(28px, 4vw, 52px); line-height: 0.96; font-weight: 700; letter-spacing: -0.01em; text-transform: uppercase;">Library</h2>
         <div style="display: flex; flex-wrap: wrap; align-items: flex-end; column-gap: 32px; row-gap: 18px; margin-bottom: 8px;">
         <div data-tagbar="1" style="flex: 1 1 360px; min-width: 0; display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
           <sc-for list="{{ tags }}" as="t" hint-placeholder-count="5">
-            <button onClick="{{ t.select }}" style="cursor: pointer; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; padding: 9px 14px; border: 1px solid {{ t.borderColor }}; background: {{ t.bg }}; color: {{ t.color }}; transition: all 0.25s ease;" style-hover="border-color: rgba(232,226,214,0.45); color: #f2efe9;">{{ t.label }}</button>
+            <button onClick="{{ t.select }}" style="cursor: pointer; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; flex: none; white-space: nowrap; padding: 9px 14px; border: 1px solid {{ t.borderColor }}; background: {{ t.bg }}; color: {{ t.color }}; transition: all 0.25s ease;" style-hover="border-color: rgba(232,226,214,0.45); color: #f2efe9;">{{ t.label }}</button>
           </sc-for>
 
         </div>
@@ -230,7 +242,7 @@
         </div>
       </div>
 
-      <div onMouseLeave="{{ leaveRows }}" style="position: relative; z-index: 2; margin: 0 -28px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0;">
+      <div onMouseLeave="{{ leaveRows }}" style="position: relative; z-index: 2; margin: 0 -28px; display: grid; grid-template-columns: repeat(auto-fill, minmax(max(calc(33.333% - 0.1px), min(100%, 340px)), 1fr)); gap: 0;">
         <sc-for list="{{ archive }}" as="row" hint-placeholder-count="9">
           <button key="{{ row.key }}" data-flip-key="{{ row.key }}" onMouseEnter="{{ row.hover }}" onClick="{{ row.open }}" style="position: relative; display: block; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; cursor: pointer; border: 0; padding: 0; margin: 0; text-align: left; background-color: #101013; opacity: {{ row.itemOpacity }}; transform: {{ row.itemTransform }}; filter: {{ row.itemBlur }}; animation: {{ row.enterAnim }}; transition: opacity 0.55s cubic-bezier(0.4,0,0.2,1) {{ row.itemDelay }}, transform 0.55s cubic-bezier(0.4,0,0.2,1), filter 0.55s cubic-bezier(0.4,0,0.2,1) {{ row.itemDelay }}; will-change: transform, opacity;">
             <div style="position: absolute; inset: 0; background-image: {{ row.image }}; background-size: cover; background-position: {{ row.bgPos }}; transform-origin: {{ row.bgPos }}; filter: grayscale({{ row.gray }}) brightness({{ row.bright }}); transform: scale({{ row.zoomFill }}); transition: filter 0.6s ease, transform 1.4s cubic-bezier(0.16,1,0.3,1);"></div>
@@ -243,9 +255,9 @@
               </sc-if>
             </sc-if>
             <div aria-hidden="true" style="position: absolute; inset: 0; z-index: 2; pointer-events: none; box-shadow: {{ row.ring }}; transition: box-shadow 0.5s cubic-bezier(0.22,1,0.36,1);"></div>
-            <div style="position: absolute; left: 0; right: 0; bottom: 0; display: flex; align-items: baseline; gap: 12px; padding: 40px 20px 16px; opacity: {{ row.labelOpacity }}; transform: translateY({{ row.labelShift }}); transition: opacity 0.5s ease, transform 0.7s cubic-bezier(0.16,1,0.3,1); background: linear-gradient(0deg, rgba(10,10,11,0.7) 0%, rgba(10,10,11,0) 100%); font-family: 'Courier Prime', 'Courier New', monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: #f2efe9; pointer-events: none;">
+            <div style="position: absolute; left: 0; right: 0; bottom: 0; display: flex; align-items: baseline; gap: 12px; padding: 40px {{ row.labelPadX }} {{ row.labelPadB }}; opacity: {{ row.labelOpacity }}; transform: translateY({{ row.labelShift }}); transition: opacity 0.5s ease, transform 0.7s cubic-bezier(0.16,1,0.3,1); background: linear-gradient(0deg, rgba(10,10,11,0.7) 0%, rgba(10,10,11,0) 100%); font-family: 'Courier Prime', 'Courier New', monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: #f2efe9; pointer-events: none;">
               <span style="flex: 1 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3; padding-bottom: 0.12em;">{{ row.title }}</span>
-              <span style="flex: 0 0 auto; margin-left: 16px; white-space: nowrap; color: #b8b2a9;">{{ row.tileKind }}</span>
+              <sc-if value="{{ row.showKind }}" hint-placeholder-val="{{ true }}"><span style="flex: 0 0 auto; margin-left: 16px; white-space: nowrap; color: #b8b2a9;">{{ row.tileKind }}</span></sc-if>
             </div>
           </button>
         </sc-for>
@@ -293,7 +305,7 @@
   </sc-if>
 
   <sc-if value="{{ isInfo }}" hint-placeholder-val="{{ false }}">
-    <main ref="{{ infoRef }}" onMouseMove="{{ fluidMove }}" onMouseLeave="{{ fluidLeave }}" onClick="{{ fluidClick }}" style="flex: 1; padding: 96px 28px 64px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 56px; align-items: stretch;">
+    <main ref="{{ infoRef }}" onMouseMove="{{ fluidMove }}" onMouseLeave="{{ fluidLeave }}" onClick="{{ fluidClick }}" style="flex: 1; padding: 96px clamp(16px, 5vw, 28px) 64px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 56px; align-items: stretch;">
 
       <div style="position: relative; min-height: 100%; margin-bottom: -64px; padding-bottom: 64px;">
       <section style="position: sticky; top: 96px; height: calc(100vh - 160px); min-height: 520px; overflow: hidden; container-type: inline-size; align-self: start;">
@@ -313,7 +325,7 @@
       </section>
       </div>
 
-      <section style="position: relative; z-index: 3; padding-right: 64px; display: flex; flex-direction: column; gap: 44px;">
+      <section style="position: relative; z-index: 3; padding-right: clamp(24px, 7vw, 64px); display: flex; flex-direction: column; gap: 44px;">
         <div style="display: flex; flex-direction: column; gap: 16px; font-size: 14.5px; line-height: 1.6; color: #ded8cf; max-width: 56ch; text-wrap: pretty;">
           <p data-reveal="1" style="opacity: 0; transform: translate3d(0, 34px, 0); filter: blur(8px); transition: opacity 1.1s cubic-bezier(0.22,1,0.36,1), transform 1.3s cubic-bezier(0.16,1,0.3,1), filter 1.1s ease; margin: 0 0 4px; font-size: 19px; line-height: 1.3; font-weight: 700; color: #f2efe9;">Jordan Fein is a film and commercial director known for bold visual storytelling and manifesto campaigns.</p>
           <p data-reveal="1" style="opacity: 0; transform: translate3d(0, 34px, 0); filter: blur(8px); transition: opacity 1.1s cubic-bezier(0.22,1,0.36,1), transform 1.3s cubic-bezier(0.16,1,0.3,1), filter 1.1s ease; margin: 0;">He makes pictures that move like a freight train: cinematic, unflinching, and built to break through. He’s directed Super Bowl spots, wrangled celebrities, and creates films that feel as dynamic as they are human.</p>
@@ -567,21 +579,22 @@ function splitCredits(list) {
 }
 
 function slugify(s) { return String(s || "").toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/&/g, " and ").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "project"; }
+const PAGES = new Set(["adobe","brad-pitt-around-the-table","carlos-sainz","celebrity","chevy","choctaw","choctaw-2","comerica","first-financial","formula-1","formula-1-drivers","forrest-gump","i-survived","i-survived-9-11","i-survived-a-face-transplant","jackie-chan","jerry-seinfeld-and-jim-gaffigan","kat-dennings","keanu-reeves-keke-palmer-seth-rogen-and-aziz-ansari","kevin-hart","land-rover","matt-damon-casey-affleck","new-york-city-ballet","novant","penn-state-health","pennstate-health","pointcard","rakuten","ralph-fiennes","ron-howard","sofia-vergara","squarespace","starbucks","team-usa-soccer","the-blessing-trailer","uc-davis","verizon","volvo","who-cares-trailer"]);
 function slugHref(r) {
   const used = {};
   for (let i = 0; i < ARCHIVE.length; i++) {
     const a = ARCHIVE[i];
     if (!a.vid) continue;
     let s = slugify(a.title); used[s] = (used[s] || 0) + 1; if (used[s] > 1) s += "-" + used[s];
-    if (a === r || a.vid === r.vid) return "work/" + s + (LIVE ? "/" : "/index.html");
+    if (a === r || a.vid === r.vid) return PAGES.has(s) ? "work/" + s + (LIVE ? "/" : "/index.html") : "";
   }
-  return "/#archive";
+  return "";
 }
 function kindsOf(k) { return String(k || "").split(/\s*[,/&]\s*|\s+and\s+/i).map((x) => x.trim()).filter(Boolean); }
 function hasTag(r, t) { if (t === "All") return !r.hidden; return kindsOf(r.kind).some((k) => k.toLowerCase() === String(t).toLowerCase()); }
 
 function applySheet(text) {
-  text = text.replace(/Richardo Acosta/g, "Ricardo Acosta").replace(/Who Care Trailer/g, "Who Cares Trailer").replace(/Minneapolis St Paul/g, "Minneapolis St. Paul").replace(/Travel\+Leisure/g, "Travel + Leisure").replace(/Best Of Fest/g, "Best of Fest").replace(/Best Coverage Of Native America/g, "Best Coverage of Native America").replace(/Production co\b\.?/gi, "Production Co.");
+  text = text.replace(/Richardo Acosta/g, "Ricardo Acosta").replace(/Lance Edmonds/g, "Lance Edmands").replace(/Who Care Trailer/g, "Who Cares Trailer").replace(/Minneapolis St Paul/g, "Minneapolis St. Paul").replace(/Travel\+Leisure/g, "Travel + Leisure").replace(/Best Of Fest/g, "Best of Fest").replace(/Best Coverage Of Native America/g, "Best Coverage of Native America").replace(/Production co\b\.?/gi, "Production Co.");
   const rows = parseCSV(text);
   if (!rows.length) return false;
   let head = rows[0].map((h) => h.toLowerCase());
@@ -748,6 +761,18 @@ class Component extends DCLogic {
   };
 
   componentDidMount() {
+    this._onStick = () => {
+      if (!this._narrow || this.state.view !== "archive") { if (this.state.tagStuck) this.setState({ tagStuck: false }); return; }
+      const bar = document.querySelector("[data-tagbar]"), nav = document.querySelector("header nav");
+      if (!bar || !nav) return;
+      const top = Math.round(nav.getBoundingClientRect().bottom + 10);
+      const stuck = bar.getBoundingClientRect().bottom < top;
+      if (stuck !== !!this.state.tagStuck || top !== this.state.stickyTop) this.setState({ tagStuck: stuck, stickyTop: top });
+    };
+    window.addEventListener("scroll", this._onStick, { passive: true });
+    this._mqN = window.matchMedia("(max-width: 700px)"); this._narrow = this._mqN.matches;
+    this._onNarrow = () => { this._narrow = this._mqN.matches; this.forceUpdate(); };
+    this._mqN.addEventListener ? this._mqN.addEventListener("change", this._onNarrow) : this._mqN.addListener(this._onNarrow);
     this.loadPlays(); this._playsI = setInterval(() => this.loadPlays(), 300000);
     this._onReadScroll = () => this.readCheck();
     window.addEventListener("scroll", this._onReadScroll, { passive: true });
@@ -862,6 +887,8 @@ class Component extends DCLogic {
   }
 
   componentWillUnmount() {
+    window.removeEventListener("scroll", this._onStick);
+    if (this._mqN) this._mqN.removeEventListener ? this._mqN.removeEventListener("change", this._onNarrow) : this._mqN.removeListener(this._onNarrow);
     clearInterval(this._playsI);
     this._unmounted = true;
     if (this._gesture) { window.removeEventListener("pointerdown", this._gesture, { capture: true }); window.removeEventListener("keydown", this._gesture, { capture: true }); }
@@ -1206,13 +1233,11 @@ class Component extends DCLogic {
       const dt = Math.min(0.05, Math.max(0.001, (now - (this._flT || now - 16)) / 1000)); this._flT = now;
       const sx = window.scrollX, sy = window.scrollY;
       const raw = this._ptr && this._flReady ? { x: this._ptr.x + sx, y: this._ptr.y + sy } : null;
-      const SP = this._sp || (this._sp = { x: 0, y: 0, k: 0, init: false });
-      const pa = 1 - Math.exp(-dt * 14);
-      if (raw) { if (!SP.init) { SP.x = raw.x; SP.y = raw.y; SP.init = true; } SP.x += (raw.x - SP.x) * pa; SP.y += (raw.y - SP.y) * pa; }
-      SP.k += ((raw ? 1 : 0) - SP.k) * (1 - Math.exp(-dt * 5));
-      if (!raw && SP.k < 0.01) SP.init = false;
-      const p = SP.init && SP.k > 0.005 ? { x: SP.x, y: SP.y } : null;
-      const ease = 1 - Math.exp(-dt * 7);
+      const f60 = dt * 60;
+      const pv = raw && this._pPrev ? Math.hypot(raw.x - this._pPrev.x, raw.y - this._pPrev.y) / f60 : 0;
+      this._pPrev = raw;
+      this._pv = (this._pv || 0) + (Math.min(1, pv / 14) - (this._pv || 0)) * 0.2;
+      const PV = this._pv;
       const rips = (this._ripples || []).filter((r) => now - r.t < 2400);
       this._ripples = rips;
       let cand;
@@ -1220,8 +1245,8 @@ class Component extends DCLogic {
       else {
         const set = new Set(F.active);
         F.anchored.forEach((L) => set.add(L));
-        if (p) {
-          const cx = Math.floor(p.x / F.cell), cy = Math.floor(p.y / F.cell);
+        if (raw) {
+          const cx = Math.floor(raw.x / F.cell), cy = Math.floor(raw.y / F.cell);
           for (let i = -2; i <= 2; i++) for (let j = -2; j <= 2; j++) {
             const arr = F.buckets.get((cx + i) + "," + (cy + j));
             if (arr) arr.forEach((L) => set.add(L));
@@ -1238,35 +1263,32 @@ class Component extends DCLogic {
           if (!ar) { ar = L.anchor.getBoundingClientRect(); aRect.set(L.anchor, ar); }
           cx = ar.left + sx + L.ox; cy = ar.top + sy + L.oy;
         }
-        let tx = 0, ty = 0, ts = 1, tr = 0;
-        if (p) {
-          const dx = cx - p.x, dy = cy - p.y, d = Math.hypot(dx, dy) || 1;
-          const k = Math.exp(-(d * d) / (2 * L.sig * L.sig)) * SP.k;
-          if (k > 0.01) {
-            tx += (dx / d) * k * L.mx;
-            ty += (dy / d) * k * L.my - k * L.lift;
-            ts += k * 0.08;
-            tr += (dx / d) * k * 3;
-          }
+        if (L.vx == null) { L.vx = 0; L.vy = 0; }
+        if (raw) {
+          const dx = cx + L.x - raw.x, dy = cy + L.y - raw.y, d2 = dx * dx + dy * dy, R = L.sig * 1.6;
+          if (d2 < R * R && d2 > 0.01) { const d = Math.sqrt(d2), n = 1 - d / R, fo = n * n * (0.3 + PV * 1.5) * (L.mx / 10); L.vx += (dx / d) * fo * f60; L.vy += (dy / d) * fo * f60; }
         }
         for (let i = 0; i < rips.length; i++) {
           const r = rips[i], age = now - r.t;
           const dx = cx - r.x, dy = cy - r.y, d = Math.hypot(dx, dy) || 1;
-          const R = age * 0.55, band = Math.exp(-((d - R) * (d - R)) / 3200) * (1 - age / 2400);
-          if (band > 0.01) { tx += (dx / d) * band * L.rip * 0.5; ty += (dy / d) * band * L.rip * 0.5 - band * L.rip * 0.4; ts += band * 0.08; }
+          const band = Math.exp(-((d - age * 0.55) * (d - age * 0.55)) / 3200) * (1 - age / 2400);
+          if (band > 0.01) { L.vx += (dx / d) * band * L.rip * 0.05 * f60; L.vy += (dy / d) * band * L.rip * 0.05 * f60; }
         }
-        L.x += (tx - L.x) * ease; L.y += (ty - L.y) * ease; L.s += (ts - L.s) * ease; L.r += (tr - L.r) * ease;
-        const moving = Math.abs(L.x) > 0.03 || Math.abs(L.y) > 0.03 || Math.abs(L.s - 1) > 0.0005 || Math.abs(L.r) > 0.03 || Math.abs(tx) > 0.03 || Math.abs(ty) > 0.03;
+        L.vx += -L.x * 0.022 * f60; L.vy += -L.y * 0.022 * f60;
+        const damp = Math.pow(0.88, f60); L.vx *= damp; L.vy *= damp;
+        L.x += L.vx * f60; L.y += L.vy * f60;
+        const lim = L.mx * 1.8; if (L.x > lim) L.x = lim; else if (L.x < -lim) L.x = -lim; if (L.y > lim) L.y = lim; else if (L.y < -lim) L.y = -lim;
+        const moving = Math.abs(L.x) > 0.02 || Math.abs(L.y) > 0.02 || Math.abs(L.vx) > 0.005 || Math.abs(L.vy) > 0.005;
         if (moving) {
           L.on = true; F.active.add(L); busy = true;
-          L.el.style.transform = "translate3d(" + L.x.toFixed(2) + "px," + L.y.toFixed(2) + "px,0) scale(" + L.s.toFixed(4) + ") rotate(" + L.r.toFixed(3) + "deg)";
+          L.el.style.transform = "translate3d(" + L.x.toFixed(3) + "px," + L.y.toFixed(3) + "px,0)";
         } else if (L.on) {
-          L.on = false; L.x = 0; L.y = 0; L.s = 1; L.r = 0; F.active.delete(L);
+          L.on = false; L.x = 0; L.y = 0; L.vx = 0; L.vy = 0; F.active.delete(L);
           L.el.style.transform = "";
         }
       });
-      if (busy || rips.length || (SP.k > 0.005 && SP.k < 0.995) || (raw && (Math.abs(raw.x - SP.x) > 0.3 || Math.abs(raw.y - SP.y) > 0.3))) this.fluidLoop();
-      else this._flT = 0;
+      if (busy || rips.length || PV > 0.01) this.fluidLoop();
+      else { this._flT = 0; this._pPrev = null; }
     });
   }
 
@@ -1386,6 +1408,7 @@ class Component extends DCLogic {
     const order = ARCHIVE.filter((r) => hasTag(r, this.state.tag) && r.vid && MUX.has(r.vid)).map((r) => r.vid);
     const PER = 3;
     let sec = 0;
+    const lite = this._narrow || (navigator.connection && (navigator.connection.saveData || /2g/.test(navigator.connection.effectiveType || "")));
     const idle = window.requestIdleCallback ? (cb) => window.requestIdleCallback(cb, { timeout: 1500 }) : (cb) => setTimeout(cb, 200);
     const step = () => {
       if (this.state.view !== "archive") { this._warmed = false; return; }
@@ -1395,7 +1418,7 @@ class Component extends DCLogic {
       sec++;
       Promise.all(ids.map((id) => this.warmOne(id))).then(() => { this._warmT = setTimeout(() => idle(step), sec < 2 ? 150 : 700); });
     };
-    step();
+    if (!lite) step();
     if (this._warmIO) this._warmIO.disconnect();
     if ("IntersectionObserver" in window) {
       this._warmIO = new IntersectionObserver((entries) => {
@@ -1968,6 +1991,11 @@ class Component extends DCLogic {
     return {
       cursorRef: this.cursorRef,
       liquidRef: this.liquidRef,
+      stickyTags: !!this._narrow,
+      stickyTop: (this.state.stickyTop || 56) + "px",
+      stickyOpacity: this.state.tagStuck ? 1 : 0,
+      stickyShift: this.state.tagStuck ? "0px" : "-8px",
+      stickyEvents: this.state.tagStuck ? "auto" : "none",
       hasYtViews: this.state.plays != null && this.state.plays >= 100000,
       ytViews: (() => { const n = this.state.plays || 0; if (n >= 10e6) return Math.floor(n / 1e6) + " million"; if (n >= 1e6) return (Math.floor(n / 1e5) / 10).toString().replace(/\.0$/, "") + " million"; return (Math.floor(n / 1e4) * 1e4).toLocaleString("en-US"); })(),
       blessingHref: "work/the-blessing-trailer" + (LIVE ? "/" : "/index.html"),
@@ -2125,6 +2153,8 @@ class Component extends DCLogic {
       popupIsYt: !!(pop && isYT(pop.vid)),
       popupMux: pop && MUX.has(pop.vid) ? pop.vid : "",
       playerIsMux: MUX.has(cur.vid),
+      heroPoster: MUX.has(cur.vid) ? 'url("https://image.mux.com/' + cur.vid + '/thumbnail.webp?width=' + (this._narrow ? 900 : 1920) + '&time=' + (THUMB_AT[cur.vid] || 0) + '")' : "none",
+      heroFill: String((this._bars && this._bars[cur.vid]) || 1),
       playerIsYt: !!this.state.sheetReady && isYT(cur.vid),
       progRef: this.progRef,
       timeRef: this.timeRef,
@@ -2211,7 +2241,7 @@ class Component extends DCLogic {
 
       coverWidth: "max(100vw, " + Math.round((this.ratio(cur) * 100)) + "vh)",
       projectCount: FEATURED.length,
-      projects: FEATURED.map((p, i) => {
+      projects: FEATURED.map((p, i) => Object.assign({ showTitle: !this._narrow }, (() => {
         const active = i === this.state.index;
         return {
           num: pad(i + 1),
@@ -2225,7 +2255,7 @@ class Component extends DCLogic {
           enter: () => this.hoverRail(i),
           select: () => { clearTimeout(this._railTimer); this.pick(i); }
         };
-      }),
+      })())),
 
       tags: TAGS.map((t) => ({
         label: t,
@@ -2259,7 +2289,10 @@ class Component extends DCLogic {
         bright: i === this.state.hovered ? 1.04 : 0.94,
         zoom: i === this.state.hovered ? 1.06 : 1,
         ring: i === this.state.hovered ? "inset 0 0 0 1px rgba(242,239,233,0.55)" : "inset 0 0 0 0px rgba(242,239,233,0)",
-        labelShift: i === this.state.hovered ? "0px" : "6px",
+        labelShift: i === this.state.hovered || this._narrow ? "0px" : "6px",
+        showKind: !this._narrow,
+        labelPadX: this._narrow ? "16px" : "20px",
+        labelPadB: this._narrow ? "12px" : "16px",
         labelOpacity: i === this.state.hovered ? 1 : 0.78,
         frameBorder: i === this.state.hovered ? "rgba(232,226,214,0.5)" : "rgba(232,226,214,0.14)",
         playing: this.state.archiveView === "grid" && this.state.previewPlaying && i === this.state.hovered && !!r.vid,
@@ -2340,8 +2373,8 @@ class Component extends DCLogic {
             color: s.idxHover < 0 ? "#d8d2c9" : s.idxHover === r.i ? "#ffffff" : "#5c5852",
             cursor: r.vid ? "pointer" : "default",
             hover: () => this.hoverIndex(r),
-            href: slugHref(r),
-            open: () => {}
+            href: slugHref(r) || "#archive",
+            open: (e) => { if (slugHref(r) || !r.vid) return; e.preventDefault(); this.clearTimers(); this.setState({ popup: r, credits: false, cursor: "close", previewPlaying: false, dwell: false, chrome: true }); this.showChrome(); }
           })),
           leaveIndex: () => { clearTimeout(this._idxT); this.setState({ idxHover: -1, idxPlay: false }); },
           floatOpacity: hov && hov.vid && !s.popup ? 1 : 0,
