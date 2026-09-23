@@ -1965,6 +1965,19 @@ class Component extends DCLogic {
       v.loop = v.getAttribute("data-loop") === "1";
       v.playsInline = v.getAttribute("data-inline") !== "0";
       v.autoplay = true;
+      if (v.muted) { v.defaultMuted = true; v.setAttribute("muted", ""); }
+      if (v.playsInline) { v.setAttribute("playsinline", ""); v.setAttribute("webkit-playsinline", ""); }
+      v.setAttribute("autoplay", "");
+      if (!v._kick) {
+        v._kick = true;
+        const kick = () => { if (v._muxId && v.paused && (v.getAttribute("data-active") === "1" || !v.hasAttribute("data-slot"))) { if (v.getAttribute("data-muted") !== "0") v.muted = true; v.play().catch(() => {}); } };
+        ["loadedmetadata", "loadeddata", "canplay"].forEach((e) => v.addEventListener(e, kick));
+        if (!this._touchKick) {
+          this._touchKick = true;
+          const any = () => { document.querySelectorAll("video[data-mux]").forEach((x) => { if (x._muxId && x.paused && (x.getAttribute("data-active") === "1" || !x.hasAttribute("data-slot"))) { if (x.getAttribute("data-muted") !== "0") x.muted = true; x.play().catch(() => {}); } }); };
+          ["touchstart", "touchend", "scroll", "pointerdown"].forEach((e) => window.addEventListener(e, any, { passive: true }));
+        }
+      }
       if (v.getAttribute("data-hq") === "1") v.addEventListener("loadedmetadata", () => { if (v.videoWidth && v.videoHeight) { this._vasp = this._vasp || {}; this._vasp[id] = v.videoWidth / v.videoHeight; if (this.state.popup && this.state.popup.vid === id && !(this._asp && this._asp[id])) this.forceUpdate(); } }, { once: true });
       const startAt = v.getAttribute("data-muted") !== "0" && THUMB_AT[id] != null ? THUMB_AT[id] : 0;
       if (startAt) v.addEventListener("loadedmetadata", () => { if (v.currentTime < 0.5 && v.duration > startAt) v.currentTime = startAt; }, { once: true });
