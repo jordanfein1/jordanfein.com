@@ -74,10 +74,12 @@
   a { color: #f2efe9; text-decoration: none; }
   a:hover { color: #8d8880; }
   ::selection { background: #e8e2d6; color: #0a0a0b; }
-  @media (max-width: 700px) { [data-hdr] { flex-direction: column !important; align-items: center !important; justify-content: flex-start !important; gap: 7px !important; } [data-hdr-name] { justify-content: center !important; } [data-hdr-nav] { justify-content: center !important; }
+  @media (max-width: 700px) { [data-hdr] { flex-direction: column !important; align-items: center !important; justify-content: flex-start !important; gap: 14px !important; } [data-hdr-name] { justify-content: center !important; } [data-hdr-nav] { justify-content: center !important; }
     [data-hdr] { padding-top: calc(env(safe-area-inset-top, 0px) + 51px) !important; }
     [data-mtop] { padding-top: calc(env(safe-area-inset-top, 0px) + 145px) !important; }
     [data-mtop-in] { margin-top: calc(-1 * (env(safe-area-inset-top, 0px) + 145px)) !important; padding-top: calc(env(safe-area-inset-top, 0px) + 145px) !important; }
+    [data-mtop="lib"] { padding-top: calc(env(safe-area-inset-top, 0px) + 115px) !important; }
+    [data-mtop="lib"] [data-mtop-in] { margin-top: calc(-1 * (env(safe-area-inset-top, 0px) + 115px)) !important; padding-top: calc(env(safe-area-inset-top, 0px) + 115px) !important; }
     [data-lib-title] { text-align: center; margin-bottom: 20px !important; }
     [data-lib-top] { flex-direction: column !important; align-items: stretch !important; row-gap: 26px !important; }
     [data-lib-plays] { order: -1; margin-left: 0 !important; align-items: center !important; text-align: center !important; }
@@ -225,7 +227,7 @@
   </sc-if>
 
   <sc-if value="{{ isArchive }}" hint-placeholder-val="{{ false }}">
-    <main data-mtop="1" style="position: relative; isolation: isolate; flex: 1; padding: 96px 28px 48px; display: grid; grid-template-columns: minmax(0, 1fr); grid-auto-rows: max-content; align-content: start; gap: 28px;">
+    <main data-mtop="lib" style="position: relative; isolation: isolate; flex: 1; padding: 96px 28px 48px; display: grid; grid-template-columns: minmax(0, 1fr); grid-auto-rows: max-content; align-content: start; gap: 28px;">
       <sc-if value="{{ stickyTags }}" hint-placeholder-val="{{ false }}">
         <div data-tagstick="1" style="position: fixed; left: 0; right: 0; top: {{ stickyTop }}; z-index: 39; display: flex; flex-wrap: wrap; gap: 8px; padding: 10px clamp(16px, 5vw, 28px); background: rgba(10,10,11,0.82); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid rgba(232,226,214,0.1); opacity: {{ stickyOpacity }}; transform: translateY({{ stickyShift }}); pointer-events: {{ stickyEvents }}; transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.22,1,0.36,1);">
           <sc-for list="{{ tags }}" as="t" hint-placeholder-count="5">
