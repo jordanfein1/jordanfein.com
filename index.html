@@ -1578,6 +1578,13 @@ class Component extends DCLogic {
     if (!frame || frame === this._vpFrame) return;
     this._vpFrame = frame;
     this._vp = null;
+    this.flushWatch();
+    if (!this._hideBound) {
+      this._hideBound = true;
+      const f = () => this.flushWatch(true);
+      window.addEventListener("pagehide", f);
+      document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") f(); });
+    }
     const attach = () => {
       if (frame !== this.popupFrameRef.current) return;
       const isMux = frame.tagName === "VIDEO";
@@ -1589,6 +1596,18 @@ class Component extends DCLogic {
       if (!isMux && !isYt) return;
       const p = isMux ? this.muxAdapter(frame) : this.ytAdapter(frame);
       this._vp = p;
+      const pop = this.state.popup || {};
+      this._watch = { title: pop.title || "", vid: pop.vid || "", cat: pop.kind || pop.subtitle || "", src: this.state.view === "work" ? "featured" : "library", host: isYt ? "youtube" : "mux", sec: 0, last: null, dur: 0, marks: {} };
+      const w = this._watch;
+      const mark = (pct) => { if (w.marks[pct] || this._watch !== w) return; w.marks[pct] = true; this.track("video_progress", { video_title: w.title, video_id: w.vid, video_category: w.cat, play_source: w.src, video_provider: w.host, percent: pct }); };
+      p.on("timeupdate", (d) => {
+        if (this._watch !== w) return;
+        if (d.duration) w.dur = d.duration;
+        if (w.last != null) { const dt = d.seconds - w.last; if (dt > 0 && dt < 2) w.sec += dt; }
+        w.last = d.seconds;
+        [25, 50, 75].forEach((m) => { if (d.percent * 100 >= m) mark(m); });
+      });
+      p.on("ended", () => mark(100));
       this._playing = !isYt;
       this._isYtPop = isYt;
       if (isYt) p.ready().then(() => { p.play(); setTimeout(() => { if (this._vp === p) p.getPaused().then((pd) => { if (pd) { this._playing = false; if (this.state.cursor === "close") this.setState({ cursor: "play" }); } }); }, 1200); });
@@ -1620,6 +1639,14 @@ class Component extends DCLogic {
       p.getDuration().then((d) => { if (this.timeRef.current) this.timeRef.current.textContent = "00:00 / " + this.fmt(d); }).catch(() => {});
     };
     attach();
+  }
+
+  flushWatch(keep) {
+    const w = this._watch;
+    if (!w) return;
+    if (w.sec >= 1) this.track("video_watch_time", { video_title: w.title, video_id: w.vid, video_category: w.cat, play_source: w.src, video_provider: w.host, watch_seconds: Math.round(w.sec), video_duration: Math.round(w.dur), percent_watched: w.dur ? Math.min(100, Math.round(w.sec / w.dur * 100)) : 0, transport_type: "beacon" });
+    w.sec = 0;
+    if (!keep) this._watch = null;
   }
 
   track(name, params) {
@@ -1732,6 +1759,7 @@ class Component extends DCLogic {
   }
 
   closePopupNow() {
+    this.flushWatch();
     if (this.cursorRef.current) this.cursorRef.current.style.visibility = "";
     if (this.state.popFromWork) this.setState({ popFromWork: false });
     if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {});
