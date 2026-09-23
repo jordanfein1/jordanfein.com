@@ -229,7 +229,7 @@
   <sc-if value="{{ isArchive }}" hint-placeholder-val="{{ false }}">
     <main data-mtop="lib" style="position: relative; isolation: isolate; flex: 1; padding: 96px 28px 48px; display: grid; grid-template-columns: minmax(0, 1fr); grid-auto-rows: max-content; align-content: start; gap: 28px;">
       <sc-if value="{{ stickyTags }}" hint-placeholder-val="{{ false }}">
-        <div data-tagstick="1" style="position: fixed; left: 0; right: 0; top: {{ stickyTop }}; z-index: 39; display: flex; flex-wrap: wrap; gap: 8px; padding: 10px clamp(16px, 5vw, 28px); background: rgba(10,10,11,0.82); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid rgba(232,226,214,0.1); opacity: {{ stickyOpacity }}; transform: translateY({{ stickyShift }}); pointer-events: {{ stickyEvents }}; transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.22,1,0.36,1);">
+        <div data-tagstick="1" style="position: fixed; left: 0; right: 0; top: {{ stickyTop }}; z-index: 39; display: flex; flex-wrap: wrap; gap: 8px; padding: 10px clamp(16px, 5vw, 28px); background: rgba(10,10,11,0.82); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid rgba(232,226,214,0.1); opacity: {{ stickyOpacity }}; transform: translateY({{ stickyShift }}); pointer-events: {{ stickyEvents }}; transition: opacity 0.7s cubic-bezier(0.4,0,0.2,1), transform 0.8s cubic-bezier(0.4,0,0.2,1);">
           <sc-for list="{{ tags }}" as="t" hint-placeholder-count="5">
             <button onClick="{{ t.select }}" style="cursor: pointer; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; flex: none; white-space: nowrap; padding: 9px 14px; border: 1px solid {{ t.borderColor }}; background: {{ t.bg }}; color: {{ t.color }}; transition: all 0.25s ease;" style-hover="border-color: rgba(232,226,214,0.45); color: #f2efe9;">{{ t.label }}</button>
           </sc-for>
@@ -1876,6 +1876,7 @@ class Component extends DCLogic {
     MUX.forEach((id) => {
       if (this._bars[id] !== undefined) return;
       this._bars[id] = 1;
+      if (id === "S2tptCnwnFU3NweU7DiJF02AnJPilBNcwq2zN5y02VfUY") return;
       const t0 = THUMB_AT[id] != null ? THUMB_AT[id] : 3;
       Promise.all([t0, t0 + 6, t0 + 14].map((t) => measure(id, t))).then((ms) => {
         ms = ms.filter(Boolean);
@@ -2112,7 +2113,7 @@ class Component extends DCLogic {
       stickyTags: !!this._narrow,
       stickyTop: (this.state.stickyTop || 56) + "px",
       stickyOpacity: this.state.tagStuck && !this.state.tagScrolling ? 1 : 0,
-      stickyShift: this.state.tagStuck && !this.state.tagScrolling ? "0px" : "-8px",
+      stickyShift: this.state.tagStuck && !this.state.tagScrolling ? "0px" : "-4px",
       stickyEvents: this.state.tagStuck && !this.state.tagScrolling ? "auto" : "none",
       ytLineRef: this.ytLineRef,
       blessingHref: "work/the-blessing-trailer" + (LIVE ? "/" : "/index.html"),
