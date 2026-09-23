@@ -86,6 +86,7 @@
   @keyframes caretBlink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
   @keyframes tileIn { from { opacity: 0; filter: blur(14px); } to { opacity: 1; filter: blur(0px); } }
   @keyframes exposeIn { 0% { opacity: 0; filter: blur(22px) brightness(0.15) contrast(1.25) grayscale(1); } 35% { opacity: 1; } 70% { filter: blur(3px) brightness(0.85) contrast(1.05) grayscale(0.3); } 100% { opacity: 1; filter: none; } }
+  @keyframes heroBreathe { from { filter: blur(22px) brightness(0.42); } to { filter: blur(18px) brightness(0.58); } }
   @keyframes lineUp { from { transform: translate3d(0, 110%, 0); clip-path: inset(0 0 100% 0); } to { transform: translate3d(0, 0, 0); clip-path: inset(-60% -30% -60% -30%); } }
   @keyframes shadeIn { from { opacity: 0; } to { opacity: 1; } }
   @media (pointer: fine) { html, body, a, button, input, textarea, label { cursor: none; } }
@@ -119,9 +120,9 @@
     <main style="flex: 1; display: flex; flex-direction: column;">
 
       <div onMouseEnter="{{ enterPlayer }}" onMouseLeave="{{ leavePlayer }}" onMouseMove="{{ movePlayer }}" onClick="{{ playWithSound }}" style="position: relative; width: 100%; height: 100svh; min-height: 460px; background-color: #000000; overflow: hidden;">
-        <div aria-hidden="true" style="position: absolute; inset: 0; background-color: #000000; background-image: {{ heroPoster }}; background-size: cover; background-position: center; transform: scale({{ heroFill }}); transition: background-image 0.2s linear;"></div>
+        <div aria-hidden="true" data-hero-poster="1" style="position: absolute; inset: 0; background-color: #000000; background-image: {{ heroPoster }}; background-size: cover; background-position: center; transform: scale({{ heroFill }}); filter: blur(22px) brightness(0.5); animation: heroBreathe 5s ease-in-out infinite alternate; transition: opacity 1.6s ease, background-image 0.2s linear;"></div>
         <sc-if value="{{ playerIsMux }}" hint-placeholder-val="{{ false }}">
-          <video key="featured-slot-0" data-hq="1" data-slot="0" data-active="{{ slot0Active }}" data-mux="{{ slot0Mux }}" data-muted="{{ slot0Muted }}" data-loop="1" playsInline="{{ true }}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale({{ slot0Fill }}); background: transparent; opacity: 0; transition: opacity 1s ease;"></video>
+          <video key="featured-slot-0" data-hq="1" data-slot="0" data-active="{{ slot0Active }}" data-mux="{{ slot0Mux }}" data-muted="{{ slot0Muted }}" data-loop="1" playsInline="{{ true }}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale({{ slot0Fill }}); background: transparent; opacity: 0; transition: opacity 1s ease, filter 1.6s cubic-bezier(0.22,1,0.36,1);"></video>
           <video key="featured-slot-1" data-hq="1" data-slot="1" data-active="{{ slot1Active }}" data-mux="{{ slot1Mux }}" data-muted="{{ slot1Muted }}" data-loop="1" playsInline="{{ true }}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale({{ slot1Fill }}); background: transparent; opacity: 0; transition: opacity 1s ease;"></video>
         </sc-if>
         <sc-if value="{{ playerIsYt }}" hint-placeholder-val="{{ true }}">
@@ -1883,6 +1884,13 @@ class Component extends DCLogic {
         v.addEventListener("playing", () => {
           if (v.getAttribute("data-active") !== "1") return;
           v.style.zIndex = "1";
+          if (!this._heroIn) {
+            this._heroIn = true;
+            v.style.transition = "none"; v.style.filter = "blur(22px) brightness(0.5)"; v.style.opacity = "1";
+            void v.offsetWidth;
+            v.style.transition = "opacity 1s ease, filter 1.6s cubic-bezier(0.22,1,0.36,1)"; v.style.filter = "none";
+            const ps = document.querySelector("[data-hero-poster]"); if (ps) setTimeout(() => { ps.style.opacity = "0"; }, 1600);
+          }
           v.style.opacity = "1";
           vids.forEach((o) => {
             if (o === v) return;
@@ -1940,9 +1948,9 @@ class Component extends DCLogic {
         if (nativeHls && v.canPlayType("application/vnd.apple.mpegurl")) v.src = url;
         else if (window.Hls && window.Hls.isSupported()) {
           const h = new window.Hls(hq
-            ? { capLevelToPlayerSize: false, startLevel: -1, abrEwmaDefaultEstimate: 20000000, abrBandWidthFactor: 0.95, abrBandWidthUpFactor: 0.9, maxBufferLength: 30, maxMaxBufferLength: 60, testBandwidth: true, startPosition: startAt || -1 }
+            ? { capLevelToPlayerSize: false, startLevel: this._heroIn ? -1 : 0, abrEwmaDefaultEstimate: 20000000, abrBandWidthFactor: 0.95, abrBandWidthUpFactor: 0.9, maxBufferLength: 30, maxMaxBufferLength: 60, testBandwidth: true, startPosition: startAt || -1 }
             : { capLevelToPlayerSize: true, startLevel: v.getAttribute("data-muted") !== "0" ? 0 : -1, maxBufferLength: v.getAttribute("data-muted") !== "0" ? 8 : 30, startPosition: startAt || -1 });
-          if (hq) h.on(window.Hls.Events.MANIFEST_PARSED, (ev, data) => { const top = (data.levels || h.levels).length - 1; if (top >= 0) { h.startLevel = top; h.nextLevel = top; h.autoLevelCapping = -1; } });
+          if (hq) h.on(window.Hls.Events.MANIFEST_PARSED, (ev, data) => { const top = (data.levels || h.levels).length - 1; if (top >= 0 && !this._heroIn) { h.startLevel = 0; h.nextLevel = -1; return; } if (top >= 0) { h.startLevel = top; h.nextLevel = top; h.autoLevelCapping = -1; } });
           h.loadSource(url); h.attachMedia(v); v._hls = h;
         }
         else if (!window.Hls && (this._hlsWait = (this._hlsWait || 0) + 1) < 60) { setTimeout(go, 150); return; }
