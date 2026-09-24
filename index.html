@@ -74,6 +74,15 @@
   a { color: #f2efe9; text-decoration: none; }
   a:hover { color: #8d8880; }
   ::selection { background: #e8e2d6; color: #0a0a0b; }
+  [data-pbar] { container-type: inline-size; }
+  @container (max-width: 760px) {
+    [data-pbar] > [data-pbar-title] { flex: 0 0 100% !important; }
+  }
+  [data-pbar] { flex-wrap: wrap; row-gap: 4px !important; }
+  @container (max-width: 760px) {
+    [data-pbar-mid] { position: static !important; transform: none !important; }
+    [data-pbar-end] { flex: 0 0 auto !important; gap: 20px !important; }
+  }
   @media (min-width: 1020px) { [data-libgrid] { grid-template-columns: repeat(6, minmax(0, 1fr)) !important; } [data-libgrid] > button { grid-column: span 2; } [data-libgrid] > button[data-span="3"] { grid-column: span 3; } [data-libgrid] > button[data-span="6"] { grid-column: span 6; } }
   @keyframes halPulse { 0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(0.9); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.08); } }
   @media (max-width: 700px) { [data-hdr] { flex-direction: column !important; align-items: center !important; justify-content: flex-start !important; gap: 14px !important; } [data-hdr-name] { justify-content: center !important; } [data-hdr-nav] { justify-content: center !important; }
@@ -484,15 +493,15 @@
           <div style="position: absolute; left: 0; right: 0; height: 2px; background: rgba(242,239,233,0.32);"></div>
           <div ref="{{ progRef }}" style="position: absolute; left: 0; height: 2px; width: 0%; background: #ffffff;"></div>
         </div>
-        <div style="position: relative; display: flex; justify-content: space-between; gap: 20px; align-items: center; padding-top: 8px; min-height: 40px;">
-          <div style="display: flex; gap: 14px; align-items: baseline; min-width: 0; flex: 1 1 0; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase;">
+        <div data-pbar="1" style="position: relative; display: flex; justify-content: space-between; gap: 20px; align-items: center; padding-top: 8px; min-height: 40px;">
+          <div data-pbar-title="1" style="display: flex; gap: 14px; align-items: baseline; min-width: 0; flex: 1 1 0; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase;">
             <span style="color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3; padding-bottom: 0.12em;">{{ popupTitle }}</span>
           </div>
-          <div style="position: absolute; left: 50%; top: 8px; transform: translateX(-50%); display: flex; gap: 18px; align-items: center; white-space: nowrap; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 12px; letter-spacing: 0.12em; color: #ffffff;">
+          <div data-pbar-mid="1" style="position: absolute; left: 50%; top: 8px; transform: translateX(-50%); display: flex; gap: 18px; align-items: center; white-space: nowrap; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 12px; letter-spacing: 0.12em; color: #ffffff;">
             <button onClick="{{ togglePlay }}" aria-label="Play or pause" style="cursor: pointer; background: transparent; border: 0; padding: 10px 0; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: #ffffff; transition: color 0.25s ease, opacity 0.25s ease; width: 54px; text-align: left;" style-hover="opacity: 0.7;"><span ref="{{ playLabelRef }}">Pause</span></button>
             <span ref="{{ timeRef }}" style="font-variant-numeric: tabular-nums;">00:00 / 00:00</span>
           </div>
-          <div style="display: flex; gap: 26px; justify-content: flex-end; align-items: center; flex: 1 1 0; min-width: 0;">
+          <div data-pbar-end="1" style="display: flex; gap: 26px; justify-content: flex-end; align-items: center; flex: 1 1 0; min-width: 0;">
             <button onClick="{{ toggleCredits }}" style="display: {{ popupCreditsDisplay }}; white-space: nowrap; flex: 0 0 auto; cursor: pointer; background: transparent; border: 0; padding: 10px 0; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: #ffffff; transition: color 0.25s ease, opacity 0.25s ease; color: {{ creditsColor }};" style-hover="color: #ffffff;">{{ creditsLabel }}</button>
             <button onClick="{{ toggleFull }}" aria-label="{{ fullLabel }}" style="cursor: pointer; background: transparent; border: 0; padding: 10px 0; display: flex; gap: 10px; align-items: center; white-space: nowrap; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #f2efe9; transition: color 0.25s ease;" style-hover="color: #ffffff;"><span>{{ fullLabel }}</span><span style="font-size: 14px; letter-spacing: 0;">{{ fullIcon }}</span></button>
           </div>
