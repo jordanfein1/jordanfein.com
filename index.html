@@ -1430,7 +1430,7 @@ class Component extends DCLogic {
   get advanceMs() {
     const s = Number(this.props.advanceSeconds);
     const cur = FEATURED[this.state.index];
-    return (s > 0 ? s : 7) * 1000 + (cur && /chevy/i.test(cur.title) ? 900 : 0);
+    return (s > 0 ? s : 7) * 1000 + (cur && /chevy/i.test(cur.title) ? 1500 : 0);
   }
 
   ratio(p) {
@@ -1445,7 +1445,7 @@ class Component extends DCLogic {
 
   featEnd(cur) {
     if (!cur) return 0;
-    if (/chevy/i.test(cur.title)) return 8.4;
+    if (/chevy/i.test(cur.title)) return 8.5;
     if (/blessing/i.test(cur.title)) return 20.9;
     return 0;
   }
@@ -1459,13 +1459,10 @@ class Component extends DCLogic {
       this._endWatch = setInterval(() => {
         if (this.state.index !== idx || this.state.view !== "work" || this.state.sound || this.state.popup) { clearInterval(this._endWatch); return; }
         const v = document.querySelector('video[data-slot][data-active="1"]');
-        const slow = /chevy/i.test((FEATURED[idx] || {}).title || "") ? { from: 6.9, rate: 0.6 } : null;
-        if (v && slow && !v.paused && v.currentTime >= slow.from && v.playbackRate !== slow.rate) v.playbackRate = slow.rate;
-        const lead = 1.1 * (slow && v && v.currentTime >= slow.from ? slow.rate : 1);
-        if (v && !v.paused && v.currentTime >= endAt - lead) {
-          const guard = () => { if (v.currentTime >= endAt) { v.pause(); v.removeEventListener("timeupdate", guard); } };
+        if (v && !v.paused && v.currentTime >= endAt - 1.1) {
+          const guard = () => { if (v.currentTime >= endAt - 0.04) { v.pause(); v.removeEventListener("timeupdate", guard); } };
           v.addEventListener("timeupdate", guard);
-          setTimeout(() => { v.removeEventListener("timeupdate", guard); v.playbackRate = 1; }, 1600);
+          setTimeout(() => v.removeEventListener("timeupdate", guard), 1600);
           clearInterval(this._endWatch); clearTimeout(this._advTimer);
           this.setState({ index: (idx + 1) % FEATURED.length, cycle: this.state.cycle + 1 });
           this.startAdvance();
