@@ -18,7 +18,8 @@
 
   function mount(box) {
     var id = box.getAttribute("data-mux"), title = box.getAttribute("data-title") || "";
-    var poster = "https://image.mux.com/" + id + "/thumbnail.webp?width=1920&time=" + (box.getAttribute("data-time") || "0");
+    var pt = parseFloat(box.getAttribute("data-time")) || 0; if (pt < 1) { var og = document.querySelector('meta[property="og:image"]'); var om = og && /time=([\d.]+)/.exec(og.content || ""); pt = om ? parseFloat(om[1]) : 3; }
+    var poster = "https://image.mux.com/" + id + "/thumbnail.webp?width=1920&time=" + pt;
     if (getComputedStyle(box).position === "static") box.style.position = "relative"; box.style.background = "#000"; box.style.overflow = "hidden";
     var v = el("video", "position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:block;");
     v.setAttribute("playsinline", ""); v.setAttribute("preload", "metadata"); v.poster = poster; v.setAttribute("aria-label", title);
