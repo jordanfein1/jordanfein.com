@@ -614,7 +614,7 @@ function splitCredits(list) {
 }
 
 function slugify(s) { return String(s || "").toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/&/g, " and ").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "project"; }
-const PAGES = new Set(["adobe","brad-pitt-around-the-table","carlos-sainz","celebrity","chevy","choctaw","choctaw-2","comerica","detect-the-sos","first-financial","formula-1","formula-1-drivers","forrest-gump","i-survived","i-survived-9-11","i-survived-a-face-transplant","jackie-chan","jerry-seinfeld-and-jim-gaffigan","kat-dennings","keanu-reeves-keke-palmer-seth-rogen-and-aziz-ansari","kevin-hart","land-rover","matt-damon-casey-affleck","new-york-city-ballet","novant","peace-steve-documentary-short","penn-state-health","pennstate-health","pennstate-health-hockey","pennstate-health-woods","pointcard","rakuten","ralph-fiennes","ron-howard","scienceu","sofia-vergara","squarespace","starbucks","summa-health","team-usa-soccer","the-blessing-trailer","uc-davis","uc-davis-dance","verizon","volvo","who-cares-trailer"]);
+const PAGES = new Set(["adobe","brad-pitt-around-the-table","carlos-sainz","celebrity","chevy","choctaw","choctaw-2","comerica","detect-the-sos","first-financial","formula-1","formula-1-drivers","forrest-gump","i-survived","i-survived-9-11","i-survived-a-face-transplant","jackie-chan","jerry-seinfeld-and-jim-gaffigan","kat-dennings","keanu-reeves-keke-palmer-seth-rogen-and-aziz-ansari","kevin-hart","land-rover","matt-damon-casey-affleck","new-york-city-ballet","novant","penn-state-health","pennstate-health","pointcard","rakuten","ralph-fiennes","ron-howard","sofia-vergara","squarespace","starbucks","summa-health","team-usa-soccer","the-blessing-trailer","uc-davis","verizon","volvo","who-cares-trailer"]);
 function slugHref(r) {
   const used = {};
   for (let i = 0; i < ARCHIVE.length; i++) {
@@ -1914,11 +1914,11 @@ class Component extends DCLogic {
     if (raw) return !vid ? "" : MUX.has(vid) ? "https://image.mux.com/" + vid + "/thumbnail.jpg?width=1600&time=" + (THUMB_AT[vid] != null ? THUMB_AT[vid] : 3) : "";
     if (vid && IMG[vid]) return IMG[vid];
     const row = vid && (ARCHIVE.find((r) => r.vid === vid) || FEATURED.find((r) => r.vid === vid));
-    if (row && /celebrity/i.test(row.title || "")) return "assets/thumb-celebrity.png";
-    if (row && /land rover/i.test(row.title || "")) return "assets/thumbs/land-rover.png";
-    if (row && /team usa/i.test(row.title || "")) return "assets/thumbs/team-usa.jpg";
-    if (row && /chevy|chevrolet/i.test(row.title || "")) return "assets/thumbs/chevy.jpg";
-    if (row && /volvo/i.test(row.title || "")) return "assets/thumbs/volvo.png";
+    if (row && /celebrity/i.test(row.title || "")) return "assets/thumbs/celebrity.jpg";
+    if (row && /land rover/i.test(row.title || "")) return "assets/thumbs/land-rover.jpg";
+    if (row && /team usa/i.test(row.title || "")) return "assets/thumbs/team-usa-sm.jpg";
+    if (row && /chevy|chevrolet/i.test(row.title || "")) return "assets/thumbs/chevy-sm.jpg";
+    if (row && /volvo/i.test(row.title || "")) return "assets/thumbs/volvo.jpg";
     return this.thumbRaw(vid);
   }
   thumbRaw(vid) { if (isYT(vid)) return ytThumb(vid); return !vid ? "" : MUX.has(vid) ? "https://image.mux.com/" + vid + "/thumbnail.jpg?width=1600&time=" + (THUMB_AT[vid] != null ? THUMB_AT[vid] : 3) : ""; }
