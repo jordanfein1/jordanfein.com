@@ -659,7 +659,7 @@ function applySheet(text) {
   };
   const items = body.map((r) => ({ title: r[iP] || "", id: (() => { const raw = (r[iI] || "").trim(); const y = ytParse(raw); return y && !/stream\.mux\.com/.test(raw) ? "yt:" + y : raw.replace(/^https?:\/\/stream\.mux\.com\//, "").replace(/\.m3u8.*$/, "").trim(); })(), kind: (r[iC] || "").trim(), year: iY >= 0 ? (r[iY] || "").trim() : "", thumbAt: iT >= 0 ? toSec(r[iT]) : null, creditList: iK >= 0 ? parseCredits(r[iK]) : [], focus: iF >= 0 ? (r[iF] || "").trim() : "", img: iImg >= 0 ? (r[iImg] || "").trim() : "", hidden: iH >= 0 && /^(y|yes|x|true|1|hide|hidden)$/i.test((r[iH] || "").trim()) })).filter((r) => r.title && r.id);
   if (!items.length) return false;
-  items.forEach((r) => { if (!isYT(r.id)) MUX.add(r.id); if (r.thumbAt != null) THUMB_AT[r.id] = r.thumbAt; else if (/sofia vergara/i.test(r.title)) THUMB_AT[r.id] = 2; if (/blessing/i.test(r.title) && !(THUMB_AT[r.id] >= 13)) THUMB_AT[r.id] = 13; if (/^celebrity$/i.test(r.title.trim()) && THUMB_AT[r.id] == null) THUMB_AT[r.id] = 3.5; const fp = r.focus ? (/^\d+$/.test(r.focus) ? "50% " + r.focus + "%" : /top/i.test(r.focus) ? "50% 15%" : /bottom/i.test(r.focus) ? "50% 85%" : "") : /sofia vergara/i.test(r.title) ? "50% 4%" : ""; if (fp) FOCUS[r.id] = fp; const im = sheetImg(r.img); if (im) IMG[r.id] = im; });
+  items.forEach((r) => { if (!isYT(r.id)) MUX.add(r.id); if (r.thumbAt != null) THUMB_AT[r.id] = r.thumbAt; else if (/sofia vergara/i.test(r.title)) THUMB_AT[r.id] = 2; if (/blessing/i.test(r.title)) THUMB_AT[r.id] = 12.6; if (/^celebrity$/i.test(r.title.trim())) THUMB_AT[r.id] = 3.2; const fp = r.focus ? (/^\d+$/.test(r.focus) ? "50% " + r.focus + "%" : /top/i.test(r.focus) ? "50% 15%" : /bottom/i.test(r.focus) ? "50% 85%" : "") : /sofia vergara/i.test(r.title) ? "50% 4%" : ""; if (fp) FOCUS[r.id] = fp; const im = sheetImg(r.img); if (im) IMG[r.id] = im; });
   FEATURED.length = 0;
   items.filter((r) => !r.hidden).slice(0, 6).forEach((r, i) => FEATURED.push({ id: "f" + i + "-" + r.id, title: r.title, subtitle: kindsOf(r.kind).join(" / "), vid: r.id, hash: "", year: r.year, creditList: r.creditList }));
   ARCHIVE.length = 0;
@@ -1430,7 +1430,7 @@ class Component extends DCLogic {
   get advanceMs() {
     const s = Number(this.props.advanceSeconds);
     const cur = FEATURED[this.state.index];
-    return (s > 0 ? s : 7) * 1000 + (cur && /chevy/i.test(cur.title) ? 700 : 0);
+    return (s > 0 ? s : 7) * 1000 + (cur && /chevy/i.test(cur.title) ? 900 : 0);
   }
 
   ratio(p) {
@@ -1443,8 +1443,35 @@ class Component extends DCLogic {
     this.startAdvance();
   }
 
+  featEnd(cur) {
+    if (!cur) return 0;
+    if (/chevy/i.test(cur.title)) return 8.4;
+    if (/blessing/i.test(cur.title)) return 20.9;
+    return 0;
+  }
+
   startAdvance() {
     clearTimeout(this._advTimer);
+    clearInterval(this._endWatch);
+    const endAt = this.featEnd(FEATURED[this.state.index]);
+    if (endAt) {
+      const idx = this.state.index;
+      this._endWatch = setInterval(() => {
+        if (this.state.index !== idx || this.state.view !== "work" || this.state.sound || this.state.popup) { clearInterval(this._endWatch); return; }
+        const v = document.querySelector('video[data-slot][data-active="1"]');
+        const slow = /chevy/i.test((FEATURED[idx] || {}).title || "") ? { from: 6.9, rate: 0.6 } : null;
+        if (v && slow && !v.paused && v.currentTime >= slow.from && v.playbackRate !== slow.rate) v.playbackRate = slow.rate;
+        const lead = 1.1 * (slow && v && v.currentTime >= slow.from ? slow.rate : 1);
+        if (v && !v.paused && v.currentTime >= endAt - lead) {
+          const guard = () => { if (v.currentTime >= endAt) { v.pause(); v.removeEventListener("timeupdate", guard); } };
+          v.addEventListener("timeupdate", guard);
+          setTimeout(() => { v.removeEventListener("timeupdate", guard); v.playbackRate = 1; }, 1600);
+          clearInterval(this._endWatch); clearTimeout(this._advTimer);
+          this.setState({ index: (idx + 1) % FEATURED.length, cycle: this.state.cycle + 1 });
+          this.startAdvance();
+        }
+      }, 120);
+    }
     this.setState({ advancing: true });
     this._advTimer = setTimeout(() => {
       if (this.state.view !== "work" || this.state.sound || this.state.popup) return;
@@ -1455,7 +1482,7 @@ class Component extends DCLogic {
   }
 
   stopAdvance() {
-    clearTimeout(this._advTimer);
+    clearTimeout(this._advTimer); clearInterval(this._endWatch);
     if (this.state.advancing) this.setState({ advancing: false });
   }
 
