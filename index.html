@@ -659,7 +659,7 @@ function applySheet(text) {
   };
   const items = body.map((r) => ({ title: r[iP] || "", id: (() => { const raw = (r[iI] || "").trim(); const y = ytParse(raw); return y && !/stream\.mux\.com/.test(raw) ? "yt:" + y : raw.replace(/^https?:\/\/stream\.mux\.com\//, "").replace(/\.m3u8.*$/, "").trim(); })(), kind: (r[iC] || "").trim(), year: iY >= 0 ? (r[iY] || "").trim() : "", thumbAt: iT >= 0 ? toSec(r[iT]) : null, creditList: iK >= 0 ? parseCredits(r[iK]) : [], focus: iF >= 0 ? (r[iF] || "").trim() : "", img: iImg >= 0 ? (r[iImg] || "").trim() : "", hidden: iH >= 0 && /^(y|yes|x|true|1|hide|hidden)$/i.test((r[iH] || "").trim()) })).filter((r) => r.title && r.id);
   if (!items.length) return false;
-  items.forEach((r) => { if (!isYT(r.id)) MUX.add(r.id); if (r.thumbAt != null) THUMB_AT[r.id] = r.thumbAt; else if (/sofia vergara/i.test(r.title)) THUMB_AT[r.id] = 2; if (/blessing/i.test(r.title) && !(THUMB_AT[r.id] >= 25)) THUMB_AT[r.id] = 25.5; if (/^celebrity$/i.test(r.title.trim()) && THUMB_AT[r.id] == null) THUMB_AT[r.id] = 5.5; const fp = r.focus ? (/^\d+$/.test(r.focus) ? "50% " + r.focus + "%" : /top/i.test(r.focus) ? "50% 15%" : /bottom/i.test(r.focus) ? "50% 85%" : "") : /sofia vergara/i.test(r.title) ? "50% 4%" : ""; if (fp) FOCUS[r.id] = fp; const im = sheetImg(r.img); if (im) IMG[r.id] = im; });
+  items.forEach((r) => { if (!isYT(r.id)) MUX.add(r.id); if (r.thumbAt != null) THUMB_AT[r.id] = r.thumbAt; else if (/sofia vergara/i.test(r.title)) THUMB_AT[r.id] = 2; if (/blessing/i.test(r.title) && !(THUMB_AT[r.id] >= 13)) THUMB_AT[r.id] = 13; if (/^celebrity$/i.test(r.title.trim()) && THUMB_AT[r.id] == null) THUMB_AT[r.id] = 3.5; const fp = r.focus ? (/^\d+$/.test(r.focus) ? "50% " + r.focus + "%" : /top/i.test(r.focus) ? "50% 15%" : /bottom/i.test(r.focus) ? "50% 85%" : "") : /sofia vergara/i.test(r.title) ? "50% 4%" : ""; if (fp) FOCUS[r.id] = fp; const im = sheetImg(r.img); if (im) IMG[r.id] = im; });
   FEATURED.length = 0;
   items.filter((r) => !r.hidden).slice(0, 6).forEach((r, i) => FEATURED.push({ id: "f" + i + "-" + r.id, title: r.title, subtitle: kindsOf(r.kind).join(" / "), vid: r.id, hash: "", year: r.year, creditList: r.creditList }));
   ARCHIVE.length = 0;
@@ -1430,7 +1430,7 @@ class Component extends DCLogic {
   get advanceMs() {
     const s = Number(this.props.advanceSeconds);
     const cur = FEATURED[this.state.index];
-    return (s > 0 ? s : 7) * 1000 + (cur && /chevy/i.test(cur.title) ? 2500 : 0);
+    return (s > 0 ? s : 7) * 1000 + (cur && /chevy/i.test(cur.title) ? 700 : 0);
   }
 
   ratio(p) {
