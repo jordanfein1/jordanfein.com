@@ -614,7 +614,7 @@ function splitCredits(list) {
 }
 
 function slugify(s) { return String(s || "").toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/&/g, " and ").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "project"; }
-const PAGES = new Set(["adobe","brad-pitt-around-the-table","carlos-sainz","celebrity","chevy","choctaw","choctaw-2","comerica","detect-the-sos","first-financial","formula-1","formula-1-drivers","forrest-gump","i-survived","i-survived-9-11","i-survived-a-face-transplant","jackie-chan","jerry-seinfeld-and-jim-gaffigan","kat-dennings","keanu-reeves-keke-palmer-seth-rogen-and-aziz-ansari","kevin-hart","land-rover","matt-damon-casey-affleck","new-york-city-ballet","novant","penn-state-health","pennstate-health","pointcard","rakuten","ralph-fiennes","ron-howard","sofia-vergara","squarespace","starbucks","summa-health","team-usa-soccer","the-blessing-trailer","uc-davis","verizon","volvo","who-cares-trailer"]);
+const PAGES = new Set(["adobe","brad-pitt-around-the-table","carlos-sainz","celebrity","chevy","choctaw","choctaw-2","comerica","detect-the-sos","first-financial","formula-1","formula-1-drivers","forrest-gump","i-survived","i-survived-9-11","i-survived-a-face-transplant","jackie-chan","jerry-seinfeld-and-jim-gaffigan","kat-dennings","keanu-reeves-keke-palmer-seth-rogen-and-aziz-ansari","kevin-hart","land-rover","matt-damon-casey-affleck","new-york-city-ballet","novant","peace-steve-documentary-short","penn-state-health","pennstate-health","pennstate-health-hockey","pennstate-health-woods","pointcard","rakuten","ralph-fiennes","ron-howard","scienceu","sofia-vergara","squarespace","starbucks","summa-health","team-usa-soccer","the-blessing-trailer","uc-davis","uc-davis-dance","verizon","volvo","who-cares-trailer"]);
 function slugHref(r) {
   const used = {};
   for (let i = 0; i < ARCHIVE.length; i++) {
@@ -2441,7 +2441,7 @@ class Component extends DCLogic {
       idxRows: this.state.idxPinned || this.state.idxHoverOpen ? "1fr" : "0fr",
       idxOpacity: this.state.idxPinned || this.state.idxHoverOpen ? 1 : 0,
       idxRot: this.state.idxPinned || this.state.idxHoverOpen ? "45deg" : "0deg",
-      idxCount: String(ARCHIVE.filter((r) => !r.hidden).length).padStart(2, "0"),
+      idxCount: String(ARCHIVE.filter((r) => !!r.title).length).padStart(2, "0"),
       idxToggle: () => this.setState((s) => ({ idxPinned: !(s.idxPinned || s.idxHoverOpen), idxHoverOpen: false })),
       idxEnter: () => { clearTimeout(this._idxHT); this._idxHT = setTimeout(() => this.setState({ idxHoverOpen: true }), 180); },
       idxLeave: () => { clearTimeout(this._idxHT); clearTimeout(this._idxT); this.setState({ idxHoverOpen: false, idxHover: -1, idxPlay: false }); },
@@ -2592,7 +2592,7 @@ class Component extends DCLogic {
       floatRef: this.floatRef,
       ...(() => {
         const s = this.state;
-        const tagOk = (r) => hasTag(r, s.indexTag);
+        const tagOk = (r) => (s.indexTag === "All" ? !!r.title : hasTag(r, s.indexTag));
         const base = ARCHIVE.map((r, i) => Object.assign({ i: i }, r));
         const rows = base.filter(tagOk);
         const split = (r) => { const p = r.title.split(" — "); return p.length > 1 ? { client: p[0], name: p[1] } : { client: r.title, name: "" }; };
@@ -2604,7 +2604,7 @@ class Component extends DCLogic {
         return {
           indexTags: TAGS.map((t) => ({
             label: t,
-            count: String(base.filter((r) => hasTag(r, t)).length).padStart(2, "0"),
+            count: String(base.filter((r) => (t === "All" ? !!r.title : hasTag(r, t))).length).padStart(2, "0"),
             color: s.indexTag === t ? "#f2efe9" : "#8d8880",
             mark: s.indexTag === t ? "•" : "",
             select: () => this.setState({ indexTag: t, idxHover: -1, idxPlay: false })
