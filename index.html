@@ -439,6 +439,19 @@
     <div onMouseMove="{{ movePopup }}" style="position: fixed; inset: 0; z-index: 60; background: rgba(6,6,7,0.78); backdrop-filter: blur(22px) saturate(1.1); -webkit-backdrop-filter: blur(22px) saturate(1.1); opacity: {{ popOpacity }}; transition: opacity 0.6s cubic-bezier(0.4,0,0.2,1);">
       <div onClick="{{ closePopup }}" style="position: absolute; inset: 0;"></div>
 
+      <div ref="{{ topBarRef }}" style="position: absolute; top: {{ barTop }}; left: {{ boxLRv }}; right: {{ boxLRv }}; z-index: 3; display: flex; align-items: {{ barAlign }}; justify-content: space-between; padding: {{ barPad }}; height: {{ barH }}; box-sizing: border-box; background: {{ barBg }}; opacity: {{ chromeOpacity }}; pointer-events: {{ topEvents }}; transition: opacity 0.6s ease;">
+        <div style="font-family: 'Courier Prime', 'Courier New', monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #8d8880;">{{ popupCounter }}</div>
+        <div style="display: flex; gap: 26px; align-items: center; pointer-events: auto;">
+        <sc-if value="{{ ytMutedBtn }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ ytSoundOn }}" style="white-space: nowrap; cursor: pointer; background: transparent; border: 0; padding: 6px 0; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: #ffffff; transition: opacity 0.25s ease;" style-hover="opacity: 0.7;">Sound on</button>
+        </sc-if>
+        <sc-if value="{{ ytCreditsBtn }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ toggleCredits }}" style="white-space: nowrap; cursor: pointer; background: transparent; border: 0; padding: 6px 0; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: {{ creditsColor }}; transition: opacity 0.25s ease;" style-hover="opacity: 0.7;">{{ creditsLabel }}</button>
+        </sc-if>
+        <button onClick="{{ closePopupBtn }}" aria-label="Close" style="cursor: pointer; background: transparent; border: 0; padding: 6px 0; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: #ffffff; transition: color 0.25s ease, opacity 0.25s ease; display: flex; gap: 10px; align-items: center;" style-hover="color: #ffffff;"><span>Close</span><span style="font-size: 18px; letter-spacing: 0;">✕</span></button>
+        </div>
+      </div>
+
       <div ref="{{ popBoxRef }}" style="opacity: {{ boxOpacity }}; position: absolute; top: {{ boxTBv }}; bottom: {{ boxTBv }}; left: {{ boxLRv }}; right: {{ boxLRv }}; z-index: 2; transition: opacity 0.45s ease, transform 0.8s cubic-bezier(0.16,1,0.3,1), top 0.7s cubic-bezier(0.16,1,0.3,1), bottom 0.7s cubic-bezier(0.16,1,0.3,1), left 0.7s cubic-bezier(0.16,1,0.3,1), right 0.7s cubic-bezier(0.16,1,0.3,1); overflow: hidden; container-type: inline-size; background: #000000; box-shadow: 0 40px 120px rgba(0,0,0,0.6); transform: scale({{ boxScale }});">
         <sc-if value="{{ popupIsMux }}" hint-placeholder-val="{{ false }}">
           <video ref="{{ popupFrameRef }}" key="{{ popupKey }}" data-hq="1" data-mux="{{ popupMux }}" data-muted="0" data-inline="{{ popupInlineAttr }}" playsInline="{{ popupInline }}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: {{ popupFit }}; transform: scale({{ popupFill }}); background: #000000; pointer-events: none;"></video>
@@ -448,15 +461,6 @@
         </sc-if>
         <div onClick="{{ clickPopup }}" onMouseEnter="{{ enterPopup }}" onMouseMove="{{ zonePopup }}" onMouseLeave="{{ leaveCursor }}" style="position: absolute; inset: 0; display: {{ popLayerDisplay }};"></div>
 
-      <div style="position: absolute; top: 0; left: 0; right: 0; z-index: 3; display: flex; align-items: center; justify-content: space-between; padding: 18px 26px 70px; background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%); opacity: {{ chromeOpacity }}; pointer-events: {{ topEvents }}; transition: opacity 0.6s ease;">
-        <div style="font-family: 'Courier Prime', 'Courier New', monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #8d8880;">{{ popupCounter }}</div>
-        <div style="display: flex; gap: 26px; align-items: center; pointer-events: auto;">
-        <sc-if value="{{ ytCreditsBtn }}" hint-placeholder-val="{{ false }}">
-          <button onClick="{{ toggleCredits }}" style="white-space: nowrap; cursor: pointer; background: transparent; border: 0; padding: 10px 0; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: {{ creditsColor }}; transition: opacity 0.25s ease;" style-hover="opacity: 0.7;">{{ creditsLabel }}</button>
-        </sc-if>
-        <button onClick="{{ closePopupBtn }}" aria-label="Close" style="cursor: pointer; background: transparent; border: 0; padding: 10px 0; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: #ffffff; transition: color 0.25s ease, opacity 0.25s ease; display: flex; gap: 10px; align-items: center;" style-hover="color: #ffffff;"><span>Close</span><span style="font-size: 18px; letter-spacing: 0;">✕</span></button>
-        </div>
-      </div>
 
       <div style="position: absolute; inset: 0; z-index: 4; display: flex; align-items: center; padding: 72px 4cqw 120px; overflow-y: auto; background: rgba(4,4,5,0.74); backdrop-filter: {{ creditsBlur }}; -webkit-backdrop-filter: {{ creditsBlur }}; opacity: {{ panelOpacity }}; pointer-events: {{ creditsEvents }}; transition: opacity 0.6s ease;">
         <div style="width: 100%; max-width: 1200px; display: flex; flex-direction: column; gap: 34px;">
@@ -1741,21 +1745,47 @@ class Component extends DCLogic {
       p.on("ended", () => mark(100));
       this._playing = !isYt;
       this._isYtPop = isYt;
-      if (isYt) p.ready().then(() => { p.play(); setTimeout(() => { if (this._vp === p) p.getPaused().then((pd) => { if (pd) { this._playing = false; if (this.state.cursor === "close") this.setState({ cursor: "play" }); } }); }, 1200); });
       const unmute = () => p.setMuted(false).then(() => p.setVolume(1)).catch(() => {});
-      p.ready().then(() => {
-        unmute().then(() => p.play()).catch(() => {
-          this._needsSound = true;
-          p.setMuted(true).then(() => p.play()).catch(() => {});
+      if (isYt) {
+        if (this.state.ytMuted) this.setState({ ytMuted: false });
+        let fellBack = false, ytState = null;
+        const cmd = (func, args) => { try { frame.contentWindow.postMessage(JSON.stringify({ event: "command", func, args: args || [] }), "*"); } catch (e) {} };
+        this._ytCmd = cmd;
+        const onMsg = (e) => {
+          if (!frame.isConnected) { window.removeEventListener("message", onMsg); return; }
+          if (e.source !== frame.contentWindow) return;
+          try { const d = typeof e.data === "string" ? JSON.parse(e.data) : e.data; const s = d && d.info && typeof d.info === "object" ? d.info.playerState : (d && d.event === "onStateChange" ? d.info : undefined); if (typeof s === "number") ytState = s; } catch (x) {}
+        };
+        window.addEventListener("message", onMsg);
+        const fallback = () => { if (fellBack || this._vp !== p) return; fellBack = true; this._needsSound = true; cmd("mute"); cmd("playVideo"); p.setMuted(true).then(() => p.play()).catch(() => {}); this.setState({ ytMuted: true }); };
+        const hello = () => { try { frame.contentWindow.postMessage(JSON.stringify({ event: "listening", id: "jf" }), "*"); } catch (e) {} };
+        hello(); frame.addEventListener("load", () => { hello(); setTimeout(() => { if (ytState !== 1) { cmd("playVideo"); setTimeout(() => { if (ytState !== 1 && ytState !== 3) fallback(); }, 900); } }, 1200); }, { once: true });
+        const watchdog = (n) => setTimeout(() => { if (this._vp !== p || fellBack || !frame.isConnected) return; if (ytState === 1) return; if (n < 6) { hello(); watchdog(n + 1); } else fallback(); }, 800);
+        watchdog(0);
+        p.ready().then(() => {
+          p.setVolume(1).catch(() => {});
+          p.play().catch(() => {});
+          const check = (n) => setTimeout(() => {
+            if (this._vp !== p || fellBack) return;
+            p.getPaused().then((pd) => { if (!pd) return; if (n < 2) { p.play().catch(() => {}); check(n + 1); } else fallback(); }).catch(() => {});
+          }, 500);
+          check(0);
+        }).catch(() => {});
+      } else {
+        p.ready().then(() => {
+          unmute().then(() => p.play()).catch(() => {
+            this._needsSound = true;
+            p.setMuted(true).then(() => p.play()).catch(() => {});
+          });
+        }).catch(() => {});
+        let tries = 0;
+        p.on("play", () => {
+          if (tries++ > 2) return;
+          p.getMuted().then((m) => { if (m) unmute().then(() => p.getPaused()).then((paused) => { if (paused) { this._needsSound = true; p.setMuted(true).then(() => p.play()); } }); }).catch(() => {});
         });
-      }).catch(() => {});
-      let tries = 0;
-      p.on("play", () => {
-        if (tries++ > 2) return;
-        p.getMuted().then((m) => { if (m) unmute().then(() => p.getPaused()).then((paused) => { if (paused) { this._needsSound = true; p.setMuted(true).then(() => p.play()); } }); }).catch(() => {});
-      });
+      }
       if (this._gesture) { window.removeEventListener("pointerdown", this._gesture, { capture: true }); window.removeEventListener("keydown", this._gesture, { capture: true }); }
-      const gesture = () => { if (this._vp === p && this._needsSound) { this._needsSound = false; unmute().then(() => p.play()).catch(() => {}); } };
+      const gesture = (ev) => { if (this._vp === p && this._needsSound && !(isYt && ev && ev.target && ev.target.closest && ev.target.closest("iframe"))) { this._needsSound = false; if (isYt) { this.setState({ ytMuted: false }); if (this._ytCmd) { this._ytCmd("unMute"); this._ytCmd("playVideo"); } } unmute().then(() => p.play()).catch(() => {}); } };
       this._gesture = gesture;
       window.addEventListener("pointerdown", gesture, { capture: true });
       window.addEventListener("keydown", gesture, { capture: true });
@@ -2369,14 +2399,17 @@ class Component extends DCLogic {
       movePopup: () => this.showChrome(),
       popupOpen: !!pop,
       popupKey: pop ? "pop-" + pop.vid : "pop",
-      popupSrc: pop && isYT(pop.vid) ? ytSrc(pop.vid, { muted: !this._narrow, controls: true, fs: !!this._narrow }) : "",
+      popupSrc: pop && isYT(pop.vid) ? ytSrc(pop.vid, { muted: false, controls: true, fs: !!this._narrow }) : "",
+      ytMutedBtn: !!(pop && isYT(pop.vid) && this.state.ytMuted),
+      ytSoundOn: (e) => { if (e) e.stopPropagation(); const p = this._vp; this.setState({ ytMuted: false }); this._needsSound = false; if (this._ytCmd) { this._ytCmd("unMute"); this._ytCmd("setVolume", [100]); this._ytCmd("playVideo"); } if (p) p.setMuted(false).then(() => p.setVolume(1)).then(() => p.play()).catch(() => {}); },
       popupInline: !this._narrow,
       popupInlineAttr: this._narrow ? "0" : "1",
       popupFrameRef: this.popupFrameRef,
       popFramePE: pop && isYT(pop.vid) ? "auto" : "none",
       popLayerDisplay: pop && isYT(pop.vid) ? "none" : "block",
-      ytFrameEnter: () => { const c = this.cursorRef.current; if (c) c.style.visibility = "hidden"; },
-      ytFrameLeave: () => { const c = this.cursorRef.current; if (c) c.style.visibility = ""; },
+      topBarRef: this.topBarRef || (this.topBarRef = React.createRef()),
+      ytFrameEnter: () => { const c = this.cursorRef.current; if (c) c.style.visibility = "hidden"; const t = this.state.isFull && this.topBarRef && this.topBarRef.current; if (t) { clearTimeout(this._tbT); this._tbT = setTimeout(() => { t.style.opacity = "0"; t.style.pointerEvents = "none"; [...t.querySelectorAll("div")].forEach((d) => { d.style.pointerEvents = "none"; }); }, 350); } },
+      ytFrameLeave: () => { const c = this.cursorRef.current; if (c) c.style.visibility = ""; const t = this.topBarRef && this.topBarRef.current; if (t) { clearTimeout(this._tbT); t.style.opacity = ""; t.style.pointerEvents = ""; [...t.querySelectorAll("div")].forEach((d) => { d.style.pointerEvents = ""; }); } },
       popBoxRef: this.popBoxRef,
       fullLabel: this.state.isFull ? "Exit full screen" : "Full screen",
       fullIcon: this.state.isFull ? "⤡" : "⤢",
@@ -2387,8 +2420,15 @@ class Component extends DCLogic {
         const maxW = vw * 0.9, maxH = Math.max(240, vh - 144);
         let w = Math.min(maxW, maxH * a), h = w / a;
         const bars = (id && this._bars && this._bars[id]) || 1;
+        const tb = this.state.isFull ? "0px" : Math.max(0, Math.round((vh - h) / 2)) + "px";
+        const ytBar = !!(id && isYT(id)) && !this.state.isFull;
         return {
-          boxTBv: this.state.isFull ? "0px" : Math.max(0, Math.round((vh - h) / 2)) + "px",
+          barTop: ytBar ? "max(8px, calc(" + tb + " - 40px))" : tb,
+          barPad: ytBar ? "0 2px" : "18px 26px 0",
+          barH: ytBar ? "30px" : "96px",
+          barAlign: ytBar ? "center" : "flex-start",
+          barBg: ytBar ? "transparent" : "linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%)",
+          boxTBv: tb,
           boxLRv: this.state.isFull ? "0px" : Math.max(0, Math.round((vw - w) / 2)) + "px",
           popupFit: this.state.isFull ? "contain" : "cover",
           popupFill: this.state.isFull || (id && this._asp && this._asp[id]) ? "1" : String(bars)
