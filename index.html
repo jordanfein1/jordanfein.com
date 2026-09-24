@@ -1370,33 +1370,32 @@ class Component extends DCLogic {
         cand = set;
       }
       const aRect = new Map();
+      cand.forEach((L) => { if (L.anchor && !aRect.has(L.anchor)) aRect.set(L.anchor, L.anchor.getBoundingClientRect()); });
       let busy = false;
       cand.forEach((L) => {
         let cx = L.ox, cy = L.oy;
-        if (L.anchor) {
-          let ar = aRect.get(L.anchor);
-          if (!ar) { ar = L.anchor.getBoundingClientRect(); aRect.set(L.anchor, ar); }
-          cx = ar.left + sx + L.ox; cy = ar.top + sy + L.oy;
-        }
+        if (L.anchor) { const ar = aRect.get(L.anchor); cx = ar.left + sx + L.ox; cy = ar.top + sy + L.oy; }
         if (L.vx == null) { L.vx = 0; L.vy = 0; }
         if (raw) {
           const dx = cx + L.x - raw.x, dy = cy + L.y - raw.y, d2 = dx * dx + dy * dy, R = L.sig * 1.6;
           if (d2 < R * R && d2 > 0.01) { const d = Math.sqrt(d2), n = 1 - d / R, fo = n * n * (0.3 + PV * 1.5) * (L.mx / 10); L.vx += (dx / d) * fo * f60; L.vy += (dy / d) * fo * f60; }
         }
+        let rx = 0, ry = 0;
         for (let i = 0; i < rips.length; i++) {
-          const r = rips[i], age = now - r.t;
+          const r = rips[i], age = now - r.t, life = 1 - age / 2400;
           const dx = cx - r.x, dy = cy - r.y, d = Math.hypot(dx, dy) || 1;
-          const band = Math.exp(-((d - age * 0.55) * (d - age * 0.55)) / 3200) * (1 - age / 2400);
-          if (band > 0.01) { L.vx += (dx / d) * band * L.rip * 0.05 * f60; L.vy += (dy / d) * band * L.rip * 0.05 * f60; }
+          const off = d - age * 0.5;
+          const band = Math.exp(-(off * off) / 5200) * life * life * (3 - 2 * life);
+          if (band > 0.002) { const a = band * Math.min(L.rip * 0.45, 9); rx += (dx / d) * a; ry += (dy / d) * a; }
         }
         L.vx += -L.x * 0.022 * f60; L.vy += -L.y * 0.022 * f60;
         const damp = Math.pow(0.88, f60); L.vx *= damp; L.vy *= damp;
         L.x += L.vx * f60; L.y += L.vy * f60;
         const lim = L.mx * 1.8; if (L.x > lim) L.x = lim; else if (L.x < -lim) L.x = -lim; if (L.y > lim) L.y = lim; else if (L.y < -lim) L.y = -lim;
-        const moving = Math.abs(L.x) > 0.02 || Math.abs(L.y) > 0.02 || Math.abs(L.vx) > 0.005 || Math.abs(L.vy) > 0.005;
+        const moving = Math.abs(L.x) > 0.02 || Math.abs(L.y) > 0.02 || Math.abs(L.vx) > 0.005 || Math.abs(L.vy) > 0.005 || Math.abs(rx) > 0.02 || Math.abs(ry) > 0.02;
         if (moving) {
           L.on = true; F.active.add(L); busy = true;
-          L.el.style.transform = "translate3d(" + L.x.toFixed(3) + "px," + L.y.toFixed(3) + "px,0)";
+          L.el.style.transform = "translate3d(" + (L.x + rx).toFixed(2) + "px," + (L.y + ry).toFixed(2) + "px,0)";
         } else if (L.on) {
           L.on = false; L.x = 0; L.y = 0; L.vx = 0; L.vy = 0; F.active.delete(L);
           L.el.style.transform = "";
