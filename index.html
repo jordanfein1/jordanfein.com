@@ -74,6 +74,7 @@
   a { color: #f2efe9; text-decoration: none; }
   a:hover { color: #8d8880; }
   ::selection { background: #e8e2d6; color: #0a0a0b; }
+  @media (min-width: 1020px) { [data-libgrid] { grid-template-columns: repeat(6, minmax(0, 1fr)) !important; } [data-libgrid] > button { grid-column: span 2; } [data-libgrid] > button[data-span="3"] { grid-column: span 3; } [data-libgrid] > button[data-span="6"] { grid-column: span 6; } }
   @keyframes halPulse { 0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(0.9); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.08); } }
   @media (max-width: 700px) { [data-hdr] { flex-direction: column !important; align-items: center !important; justify-content: flex-start !important; gap: 14px !important; } [data-hdr-name] { justify-content: center !important; } [data-hdr-nav] { justify-content: center !important; }
     [data-hdr] { padding-top: calc(env(safe-area-inset-top, 0px) + 51px) !important; }
@@ -258,9 +259,9 @@
         </div>
       </div>
 
-      <div onMouseLeave="{{ leaveRows }}" style="position: relative; z-index: 2; margin: 0 -28px; display: grid; grid-template-columns: repeat(auto-fill, minmax(max(calc(33.333% - 0.1px), min(100%, 340px)), 1fr)); gap: 0;">
+      <div data-libgrid="1" onMouseLeave="{{ leaveRows }}" style="position: relative; z-index: 2; margin: 0 -28px; display: grid; grid-template-columns: repeat(auto-fill, minmax(max(calc(33.333% - 0.1px), min(100%, 340px)), 1fr)); gap: 0;">
         <sc-for list="{{ archive }}" as="row" hint-placeholder-count="9">
-          <button key="{{ row.key }}" data-flip-key="{{ row.key }}" onMouseEnter="{{ row.hover }}" onClick="{{ row.open }}" style="position: relative; display: block; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; cursor: pointer; border: 0; padding: 0; margin: 0; text-align: left; background-color: #101013; opacity: {{ row.itemOpacity }}; transform: {{ row.itemTransform }}; filter: {{ row.itemBlur }}; animation: {{ row.enterAnim }}; transition: opacity 0.55s cubic-bezier(0.4,0,0.2,1) {{ row.itemDelay }}, transform 0.55s cubic-bezier(0.4,0,0.2,1), filter 0.55s cubic-bezier(0.4,0,0.2,1) {{ row.itemDelay }}; will-change: transform, opacity;">
+          <button key="{{ row.key }}" data-flip-key="{{ row.key }}" data-span="{{ row.span }}" onMouseEnter="{{ row.hover }}" onClick="{{ row.open }}" style="position: relative; display: block; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; cursor: pointer; border: 0; padding: 0; margin: 0; text-align: left; background-color: #101013; opacity: {{ row.itemOpacity }}; transform: {{ row.itemTransform }}; filter: {{ row.itemBlur }}; animation: {{ row.enterAnim }}; transition: opacity 0.55s cubic-bezier(0.4,0,0.2,1) {{ row.itemDelay }}, transform 0.55s cubic-bezier(0.4,0,0.2,1), filter 0.55s cubic-bezier(0.4,0,0.2,1) {{ row.itemDelay }}; will-change: transform, opacity;">
             <div style="position: absolute; inset: 0; background-image: {{ row.image }}; background-size: cover; background-position: {{ row.bgPos }}; transform-origin: {{ row.bgPos }}; filter: grayscale({{ row.gray }}) brightness({{ row.bright }}); transform: scale({{ row.zoomFill }}); transition: filter 0.6s ease, transform 1.4s cubic-bezier(0.16,1,0.3,1);"></div>
             <sc-if value="{{ row.playing }}" hint-placeholder-val="{{ false }}">
               <sc-if value="{{ row.isMux }}" hint-placeholder-val="{{ false }}">
@@ -786,6 +787,7 @@ class Component extends DCLogic {
   };
 
   componentDidMount() {
+    setTimeout(() => { (window.requestIdleCallback || ((f) => setTimeout(f, 1)))(() => { try { this.preloadThumbs(null); } catch (e) {} }); }, 4000);
     const halWait = /[?&]hal\b/.test(location.search) ? 4000 : 100000;
     this._halLast = Date.now();
     this._halPoke = (e) => {
@@ -1606,7 +1608,8 @@ class Component extends DCLogic {
       const m = new Map();
       document.querySelectorAll("[data-flip-key]").forEach((el) => {
         if (el._flip) { el._flip.cancel(); el._flip = null; }
-        m.set(el.getAttribute("data-flip-key"), { x: el.offsetLeft, y: el.offsetTop });
+        if (el._flipFade) { el._flipFade.cancel(); el._flipFade = null; }
+        m.set(el.getAttribute("data-flip-key"), { x: el.offsetLeft, y: el.offsetTop, w: el.offsetWidth });
       });
       return m;
     };
@@ -1615,11 +1618,44 @@ class Component extends DCLogic {
     this.setState(update, () => {
       requestAnimationFrame(() => {
         if (window.scrollY !== y0) window.scrollTo(0, Math.min(y0, document.documentElement.scrollHeight - window.innerHeight));
-        document.querySelectorAll("[data-flip-key]").forEach((el) => {
+        const els = Array.from(document.querySelectorAll("[data-flip-key]"));
+        const live = new Set(els.map((el) => el.getAttribute("data-flip-key")));
+        const vacated = [];
+        before.forEach((v, k) => { if (!live.has(k)) vacated.push(v); });
+        vacated.sort((p, q) => (p.y - q.y) || (p.x - q.x));
+        let nth = 0;
+        els.forEach((el) => {
           const b = before.get(el.getAttribute("data-flip-key"));
-          if (!b || typeof el.animate !== "function") return;
+          if (typeof el.animate !== "function") return;
+          if (!b) {
+            if (update.enterKeys || !before.size) return;
+            const from = (() => { if (!vacated.length) return null; let bi = 0, bd = Infinity; const minD = (el.offsetWidth || 300) * 0.6; vacated.forEach((v, j) => { if (v.used) return; const d = Math.hypot(v.x - el.offsetLeft, v.y - el.offsetTop); if (d >= minD && d < bd) { bd = d; bi = j; } }); if (bd === Infinity) return null; const v = vacated[bi]; v.used = true; if (vacated.every((q) => q.used)) vacated.forEach((q) => { q.used = false; }); return v; })();
+            const ex = from ? from.x - el.offsetLeft : 0, ey = from ? from.y - el.offsetTop : 90;
+            const sc = from && from.w ? Math.max(0.5, Math.min(1.5, from.w / (el.offsetWidth || 1))) : 0.94;
+            el.style.transformOrigin = "0 0";
+            el._flip = el.animate(
+              [{ transform: "translate3d(" + ex + "px," + ey + "px,0) scale(" + sc + ")" }, { transform: "translate3d(0,0,0) scale(1)" }],
+              { duration: 850, delay: nth * 25, easing: "cubic-bezier(0.32,0.72,0,1)", fill: "backwards" }
+            );
+            el._flipFade = el.animate(
+              [{ opacity: 0, filter: "blur(10px)" }, { opacity: 1, filter: "blur(0px)" }],
+              { duration: 420, delay: nth * 25, easing: "cubic-bezier(0.25,1,0.5,1)", fill: "backwards" }
+            );
+            el._flip.onfinish = () => { el._flip = null; };
+            nth++;
+            return;
+          }
           const dx = b.x - el.offsetLeft, dy = b.y - el.offsetTop;
-          if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
+          if (Math.abs(dx) < 1 && Math.abs(dy) < 1) {
+            if (update.enterKeys) return;
+            el.style.transformOrigin = "50% 50%";
+            el._flip = el.animate(
+              [{ transform: "translate3d(0,24px,0) scale(0.96)", filter: "blur(4px)" }, { transform: "translate3d(0,0,0) scale(1)", filter: "blur(0px)" }],
+              { duration: 850, easing: "cubic-bezier(0.32,0.72,0,1)" }
+            );
+            el._flip.onfinish = () => { el._flip = null; };
+            return;
+          }
           el._flip = el.animate(
             [{ transform: "translate3d(" + dx + "px," + dy + "px,0)" }, { transform: "translate3d(0,0,0)" }],
             { duration: 850, easing: "cubic-bezier(0.32,0.72,0,1)" }
@@ -1781,6 +1817,17 @@ class Component extends DCLogic {
     }, 2800);
   }
 
+  preloadThumbs(tag) {
+    this._pre = this._pre || {};
+    ARCHIVE.forEach((r) => {
+      if (!r.vid || this._pre[r.vid] || (tag && !hasTag(r, tag))) return;
+      const m = /url\(["']?([^"')]+)/.exec("url(" + this.thumb(r.vid) + ")");
+      if (!m) return;
+      const im = new Image(); im.decoding = "async"; im.src = m[1];
+      this._pre[r.vid] = im.decode ? im.decode().catch(() => {}) : Promise.resolve();
+    });
+  }
+
   arm() {
     this.setState({ armed: false });
     requestAnimationFrame(() => requestAnimationFrame(() => this.setState({ armed: true })));
@@ -1795,6 +1842,7 @@ class Component extends DCLogic {
     const allKeys = ARCHIVE.filter((r) => !r.hidden).map((r) => "row-" + r.title);
     const shown = ARCHIVE.filter((r) => hasTag(r, this.state.tag)).map((r) => "row-" + r.title);
     const missing = allKeys.filter((k) => shown.indexOf(k) < 0);
+    this.preloadThumbs(t);
     const reduce = () => {
       if (t === "All") return;
       this.setState({ phase: "out", pendingTag: t, previewPlaying: false, dwell: false });
@@ -2155,7 +2203,15 @@ class Component extends DCLogic {
     const dim = (c) => (c === this.state.tag ? accent : "#8d8880");
 
     const matches = (r, tag) => hasTag(r, tag);
-    const filtered = ARCHIVE.filter((r) => matches(r, this.state.tag));
+    const filtered = (() => {
+      const all = ARCHIVE.filter((r) => matches(r, this.state.tag));
+      if (this.state.tag === "All") return all;
+      const vis = all.filter((r) => !r.hidden), hid = all.filter((r) => r.hidden);
+      if (!hid.length || !vis.length) return all;
+      const out = vis.slice(), n = vis.length + hid.length;
+      hid.forEach((r, k) => { const at = Math.min(out.length, Math.round(((k + 1) * n) / (hid.length + 1)) - 1 + (k === 0 ? 1 : 0)); out.splice(Math.max(1, at), 0, r); });
+      return out;
+    })();
     const hoveredRow = filtered[this.state.hovered] || filtered[0] || ARCHIVE[0];
     const leavingTag = this.state.pendingTag;
 
@@ -2452,6 +2508,7 @@ class Component extends DCLogic {
 
 
       archive: filtered.map((r, i) => Object.assign({
+        span: (() => { const n = filtered.length, rem = n % 3; if (n === 1) return "6"; if (n === 2 || n === 4) return "3"; if (rem === 1 && i >= n - 4) return "3"; if (rem === 2 && i >= n - 2) return "3"; return "2"; })(),
         title: String(r.title || "").replace(/\s*\|\s*/g, " "),
         tileKind: (() => { const k = kindsOf(r.kind); const t = this.state.tag; const hit = t !== "All" && k.find((x) => x.toLowerCase() === String(t).toLowerCase()); return hit || k[0] || ""; })(),
         muxFill: String((this._bars && this._bars[r.vid]) || 1),
