@@ -629,6 +629,25 @@ function splitCredits(list) {
   return { credits: credits, awards: awards };
 }
 
+const BLACK_SKIP = (() => { let c = {}; try { c = JSON.parse(localStorage.getItem("jf-black-v1") || "{}"); } catch (e) {} return Object.assign({"sj3XFbjFGGfAs35rcsY02EgBNO3EpoxzkU8MEEY901Ges":0.6,"lCs2g7C1oBmV7Lp5D8mh12W02mUlT39YqfR302B9bQhjo":0,"utMGaJSSY8YqybcRgL9vCGI5cKS101RauVUx5SGeKSYM":0.15,"PhO6Ovc4UU8bZdhERqL7cFoXuZFQh102oF8IJL7JaMbo":0,"S2tptCnwnFU3NweU7DiJF02AnJPilBNcwq2zN5y02VfUY":0,"trqeWigbiCfR52ABMhpUZlJmdeT4ela7XTWYyE8gKSw":0,"PjNOoEMpVAJy01JAuAt2ooyG102tJ62Kx7Ei4D8Kk01rEo":0,"VnIeYZX23MlrgCWZVNa414M1syiqFohBV89EMVIqOL4":0,"o9YvQVCdtuI8btFw3PdUYvQ01OS4fvsXnWlRsE3wWVno":0,"g7027Aum02reEw01tCcILWXU8kTvTI4E1DC3a6ASwGXeCA":0,"PO9Bha5hjmskMWD00r02wphKVu6PuGq02UE46pJdDzcgBU":0,"7d7nxobj1RR9I3Pgk0200W015qsiZSAbj6AakECtn92D1k":0.4,"Oqm4hqTO9OMrrPHwzjgPYgYc9wueImgAvOhdpdvbLn4":0,"nZNI6GPxFKnrjN4RUu02joZHkPl54YC01f6BFzaV7UoEo":0,"nFYSLFC3xpb3a7uGpjcwOFSzwjDCfE00SiyKWacBZqGQ":0,"igPdGj25X2IGq6vMT7Cb6DlN1X2cDke7R001Hu9sK00Iw":0,"DH00mCEx6tvZCbxFm2mHrpBMfYSGV9ZB01ARl865ojJYg":0,"rq5uRdHC1L401o25ZgkFcemyH02eIYDZ201SGguYyuRDqs":0,"uMolaqhGtBi5QdivPO4ce6jtCg4xtlSgFgceCR7Y8jA":0,"baEfUC8GZQSxlyvBaxlIWpXI5zzyR76J2Pdeek00NVhM":0,"3CYpoB00KWHugTpTLjm16ntUlls4Rl3IF1LN002CcZlRk":0,"vPAx9mvJ00o4gqIn009ceKwktAHkwS01RRTPagGXzovcYs":0,"NOs28JeIe5VDTdJBNOlzWUJmlmkj4pt18x2OYL7Ea5Q":0,"YjbU3mot7hFXqOz4d94hbBErDaDur301ijg02Tz7EOdQ8":0,"9J5nBZinoboQ6Xk00KUFL01BAJItdMFReZJAACz02Dx4Dg":1.8,"31M01HTTx02zH85fRFpmh2ENxuvW02YmEs5lutp5Yijv1Y":0,"yHENnFqovYCsbSIzmtaMgMEqm17scs2D017rAfGSsb5g":0.1,"TZ013ryMWo3PsvvwJTz6bZ1g6NVatXBH8qrycDCKmaUY":0,"hv28QK00OAcP00uKzk43E5pBEQkLjDf3s7ABdJnpcIVtc":0,"srubB314aX3xircq00ZY93WCMo01YdeNaiA82GN6vDmkg":0}, c); })();
+const blackSkip = (id) => BLACK_SKIP[id] || 0;
+function scanBlackOpenings(ids) {
+  const todo = ids.filter((id) => id && !isYT(id) && !(id in BLACK_SKIP) && THUMB_AT[id] == null);
+  if (!todo.length) return;
+  const lum = (id, t) => new Promise((res) => { const im = new Image(); im.crossOrigin = "anonymous"; const to = setTimeout(() => res(-1), 6000); im.onload = () => { clearTimeout(to); try { const c = document.createElement("canvas"); c.width = 32; c.height = 18; const x = c.getContext("2d"); x.drawImage(im, 0, 0, 32, 18); const p = x.getImageData(0, 0, 32, 18).data; let s = 0; for (let i = 0; i < p.length; i += 4) s += p[i] + p[i + 1] + p[i + 2]; res(s / (p.length / 4) / 3); } catch (e) { res(-1); } }; im.onerror = () => { clearTimeout(to); res(-1); }; im.src = "https://image.mux.com/" + id + "/thumbnail.jpg?width=64&time=" + t; });
+  const steps = [0, 0.2, 0.4, 0.6, 1, 1.5, 2, 3];
+  const save = () => { try { const o = {}; Object.keys(BLACK_SKIP).forEach((k) => { o[k] = BLACK_SKIP[k]; }); localStorage.setItem("jf-black-v1", JSON.stringify(o)); } catch (e) {} };
+  (async () => {
+    for (const id of todo) {
+      let found = 0;
+      for (const t of steps) { const l = await lum(id, t); if (l < 0) { found = null; break; } if (l > 14) { found = t; break; } }
+      if (found === null) continue;
+      BLACK_SKIP[id] = found; save();
+      await new Promise((r) => setTimeout(r, 150));
+    }
+  })();
+}
+
 function slugify(s) { return String(s || "").toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/&/g, " and ").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "project"; }
 const PAGES = new Set(["adobe","brad-pitt-around-the-table","carlos-sainz","celebrity","chevy","choctaw","choctaw-2","comerica","detect-the-sos","first-financial","formula-1","formula-1-drivers","forrest-gump","i-survived","i-survived-9-11","i-survived-a-face-transplant","jackie-chan","jerry-seinfeld-and-jim-gaffigan","kat-dennings","keanu-reeves-keke-palmer-seth-rogen-and-aziz-ansari","kevin-hart","land-rover","matt-damon-casey-affleck","new-york-city-ballet","novant","peace-steve-documentary-short","penn-state-health","pennstate-health","pennstate-health-hockey","pennstate-health-woods","pointcard","rakuten","ralph-fiennes","ron-howard","scienceu","sofia-vergara","squarespace","starbucks","summa-health","team-usa-soccer","the-blessing-trailer","uc-davis","uc-davis-dance","verizon","volvo","who-cares-trailer"]);
 function slugHref(r) {
@@ -813,6 +832,7 @@ class Component extends DCLogic {
 
   componentDidMount() {
     setTimeout(() => { (window.requestIdleCallback || ((f) => setTimeout(f, 1)))(() => { try { this.preloadThumbs(null); } catch (e) {} }); }, 4000);
+    if (this.state.view === "archive") this.scanBlack();
     const halWait = /[?&]hal\b/.test(location.search) ? 4000 : 100000;
     this._halLast = Date.now();
     this._halPoke = (e) => {
@@ -1847,7 +1867,14 @@ class Component extends DCLogic {
     try { if (window.gtag) window.gtag("event", name, Object.assign({ page_section: this.state.view }, params || {})); } catch (e) {}
   }
 
+  scanBlack() {
+    if (this._blackScanned) return;
+    this._blackScanned = true;
+    setTimeout(() => { try { scanBlackOpenings(ARCHIVE.map((r) => r.vid)); } catch (e) {} }, 600);
+  }
+
   componentDidUpdate(prevProps, prevState, snapshot) {
+    if (this.state.view === "archive" && (!prevState || prevState.view !== "archive")) this.scanBlack();
     if (this._narrow && this.state.popup && (!prevState || !prevState.popup || prevState.popup.vid !== this.state.popup.vid)) this.mobileFs();
     if (prevState && prevState.plays !== this.state.plays) this.paintYtLine();
     this.attachMux();
@@ -2189,8 +2216,7 @@ class Component extends DCLogic {
         }
       }
       if (v.getAttribute("data-hq") === "1") v.addEventListener("loadedmetadata", () => { if (v.videoWidth && v.videoHeight) { this._vasp = this._vasp || {}; this._vasp[id] = v.videoWidth / v.videoHeight; if (this.state.popup && this.state.popup.vid === id && !(this._asp && this._asp[id])) this.forceUpdate(); } }, { once: true });
-      const BLACK_SKIP = { "7d7nxobj1RR9I3Pgk0200W015qsiZSAbj6AakECtn92D1k": 0.4, "utMGaJSSY8YqybcRgL9vCGI5cKS101RauVUx5SGeKSYM": 0.15, "sj3XFbjFGGfAs35rcsY02EgBNO3EpoxzkU8MEEY901Ges": 0.6, "yHENnFqovYCsbSIzmtaMgMEqm17scs2D017rAfGSsb5g": 0.1, "9J5nBZinoboQ6Xk00KUFL01BAJItdMFReZJAACz02Dx4Dg": 1.8 };
-      const startAt = v.getAttribute("data-muted") !== "0" ? (THUMB_AT[id] != null ? THUMB_AT[id] : BLACK_SKIP[id] || 0) : 0;
+      const startAt = v.getAttribute("data-muted") !== "0" ? (THUMB_AT[id] != null ? THUMB_AT[id] : blackSkip(id)) : 0;
       if (startAt) v.addEventListener("loadedmetadata", () => { if (v.currentTime < Math.min(0.5, startAt) && v.duration > startAt) v.currentTime = startAt; }, { once: true });
       const hq = v.getAttribute("data-hq") === "1";
       const phone = /iphone|ipod|android.*mobile/i.test(navigator.userAgent) || (window.matchMedia && matchMedia("(max-width: 700px)").matches);
