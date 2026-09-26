@@ -863,7 +863,7 @@ class Component extends DCLogic {
   componentDidMount() {
     requestAnimationFrame(() => requestAnimationFrame(() => { const s = document.querySelector("[data-jf-shell]"); if (s) s.remove(); }));
     { const warm = () => setTimeout(() => { const im = new Image(); im.decoding = "async"; im.src = (LIVE ? "/" : "") + "assets/jordan-fein-director-commercials-film-theater.jpg"; }, 1500); if (document.readyState === "complete") warm(); else window.addEventListener("load", warm, { once: true }); }
-    if (!this._narrow && window.innerWidth > 700 && !(navigator.connection && navigator.connection.saveData)) { const pre = () => setTimeout(() => { (window.requestIdleCallback || ((f) => setTimeout(f, 1)))(() => { try { this.preloadThumbs(null); } catch (e) {} }); }, 4000); if (document.readyState === "complete") pre(); else window.addEventListener("load", pre, { once: true }); }
+    if (!this._narrow && window.innerWidth > 700 && !(navigator.connection && navigator.connection.saveData)) { const pre = () => setTimeout(() => { (window.requestIdleCallback || ((f) => setTimeout(f, 1)))(() => { try { this.preloadThumbs(null); } catch (e) {} setTimeout(() => (window.requestIdleCallback || ((f) => setTimeout(f, 1)))(() => { try { this.preloadThumbs("*"); } catch (e) {} }), 12000); }); }, 4000); if (document.readyState === "complete") pre(); else window.addEventListener("load", pre, { once: true }); }
     if (this.state.view === "archive") this.scanBlack();
     const halWait = /[?&]hal\b/.test(location.search) ? 4000 : 100000;
     this._halLast = Date.now();
@@ -1973,7 +1973,7 @@ class Component extends DCLogic {
   preloadThumbs(tag) {
     this._pre = this._pre || {};
     ARCHIVE.forEach((r) => {
-      if (!r.vid || this._pre[r.vid] || (tag && !hasTag(r, tag))) return;
+      if (!r.vid || this._pre[r.vid] || (tag && tag !== "*" && !hasTag(r, tag)) || (!tag && r.hidden && isYT(r.vid))) return;
       const m = /url\(["']?([^"')]+)/.exec("url(" + this.thumb(r.vid) + ")");
       if (!m) return;
       const im = new Image(); im.decoding = "async"; im.src = m[1];
