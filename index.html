@@ -150,7 +150,7 @@
     </a>
     <nav data-hdr-nav="1" style="display: flex; align-items: flex-end; gap: clamp(14px, 4vw, 24px); font-family: 'Courier Prime', 'Courier New', monospace; font-size: 11.5px; line-height: 0.64; letter-spacing: 0.2em; text-transform: uppercase;">
       <a href="#work" onClick="{{ goWork }}" style="color: {{ workColor }}; padding-bottom: 0;" style-hover="color: #f2efe9;">Featured work</a>
-      <a href="#archive" onClick="{{ goArchive }}" style="color: {{ archiveColor }}; padding-bottom: 0;" style-hover="color: #f2efe9;">Library</a>
+      <a href="{{ libHref }}" onClick="{{ goArchive }}" style="color: {{ archiveColor }}; padding-bottom: 0;" style-hover="color: #f2efe9;">Library</a>
       <a href="#info" onClick="{{ goInfo }}" style="color: {{ infoColor }}; padding-bottom: 0;" style-hover="color: #f2efe9;">Info</a>
     </nav>
   </header>
@@ -2601,7 +2601,9 @@ class Component extends DCLogic {
       archiveColor: view === "archive" ? accent : "#8d8880",
       infoColor: view === "info" ? accent : "#8d8880",
       goWork: () => this.go("work"),
-      goArchive: () => {
+      libHref: LIVE ? "/library/" : "#archive",
+      goArchive: (e) => {
+        if (LIVE) { if (e && e.preventDefault) e.preventDefault(); if (!/^\/library(\/|$)/.test(location.pathname)) { try { history.pushState(null, "", "/library/"); } catch (err) {} this._routeKey = "/library/"; this.setLibMeta("All"); } }
         if (this.state.view === "archive") { if (this.state.tag !== "All") this.selectTag("All"); window.scrollTo({ top: 0, behavior: "smooth" }); }
         else { this.clearTimers && this.clearTimers(); this.setState({ tag: "All", pendingTag: null, phase: "in", enterKeys: null, indexTag: "All" }); this.go("archive"); }
       },
