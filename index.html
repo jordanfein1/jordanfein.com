@@ -42,6 +42,21 @@
 <script src="./support.js"></script>
 </head>
 <body>
+<div data-jf-shell="1" aria-hidden="true">
+<style>
+[data-jf-shell] header{position:fixed;top:0;left:0;right:0;z-index:41;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding:24px clamp(16px,5vw,28px) 62px;background:linear-gradient(180deg,rgba(10,10,11,.86) 0%,rgba(10,10,11,.72) 22%,rgba(10,10,11,.52) 42%,rgba(10,10,11,.3) 60%,rgba(10,10,11,.13) 76%,rgba(10,10,11,.04) 89%,rgba(10,10,11,0) 100%);flex-wrap:wrap;color:#f2efe9;-webkit-font-smoothing:antialiased}
+[data-jf-shell] a{text-decoration:none;color:inherit}
+[data-jf-shell] .n{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;color:#f2efe9}
+[data-jf-shell] .n b{font-family:Syne,'Helvetica Neue',sans-serif;font-size:16px;line-height:.74;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+[data-jf-shell] .n i{font-style:normal;font-family:'Courier Prime','Courier New',monospace;font-size:11.5px;line-height:.64;letter-spacing:.18em;text-transform:uppercase}
+[data-jf-shell] nav{display:flex;align-items:flex-end;gap:clamp(14px,4vw,24px);font-family:'Courier Prime','Courier New',monospace;font-size:11.5px;line-height:.64;letter-spacing:.2em;text-transform:uppercase}
+[data-jf-shell] nav a{color:#8d8880}
+[data-jf-shell] nav a.on{color:#e8e2d6}
+@media (max-width:700px){[data-jf-shell] header{flex-direction:column;align-items:center;justify-content:flex-start;gap:20px;padding-top:calc(env(safe-area-inset-top,0px) + 51px)}[data-jf-shell] .n,[data-jf-shell] nav{justify-content:center}}
+</style>
+<header><a class="n" href="/" tabindex="-1"><b>Jordan Fein</b><i>Director</i></a><nav><a href="/" data-v="work" tabindex="-1">Featured work</a><a href="/library/" data-v="archive" tabindex="-1">Library</a><a href="/#info" data-v="info" tabindex="-1">Info</a></nav></header>
+<script>(function(){var v=/^\/library(\/|$)/.test(location.pathname)||location.hash==="#archive"?"archive":location.hash==="#info"?"info":"work";var a=document.querySelector('[data-jf-shell] [data-v="'+v+'"]');if(a)a.className="on";})();</script>
+</div>
 <x-dc>
 <helmet>
 <title>Jordan Fein | Film Director | Commercial, Celebrity &amp; Unscripted Storytelling</title>
@@ -840,6 +855,7 @@ class Component extends DCLogic {
   };
 
   componentDidMount() {
+    requestAnimationFrame(() => requestAnimationFrame(() => { const s = document.querySelector("[data-jf-shell]"); if (s) s.remove(); }));
     if (!this._narrow && window.innerWidth > 700 && !(navigator.connection && navigator.connection.saveData)) { const pre = () => setTimeout(() => { (window.requestIdleCallback || ((f) => setTimeout(f, 1)))(() => { try { this.preloadThumbs(null); } catch (e) {} }); }, 4000); if (document.readyState === "complete") pre(); else window.addEventListener("load", pre, { once: true }); }
     if (this.state.view === "archive") this.scanBlack();
     const halWait = /[?&]hal\b/.test(location.search) ? 4000 : 100000;
