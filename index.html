@@ -98,7 +98,7 @@
   }
   @media (min-width: 1020px) { [data-libgrid] { grid-template-columns: repeat(6, minmax(0, 1fr)) !important; } [data-libgrid] > button { grid-column: span 2; } [data-libgrid] > button[data-span="3"] { grid-column: span 3; } [data-libgrid] > button[data-span="6"] { grid-column: span 6; } }
   @keyframes halPulse { 0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(0.9); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.08); } }
-  @media (max-width: 700px) { [data-hdr] { flex-direction: column !important; align-items: center !important; justify-content: flex-start !important; gap: 20px !important; } [data-hdr-name] { justify-content: center !important; } [data-hdr-nav] { justify-content: center !important; }
+  @media (max-width: 700px) { [data-hdr] { flex-direction: column !important; align-items: center !important; justify-content: flex-start !important; gap: 20px !important; } [data-hdr-name] { justify-content: center !important; } [data-hdr-nav] { justify-content: center !important; } [data-hdr-nav] > a, [data-hdr-name] { padding-top: 8px !important; padding-bottom: 8px !important; margin-top: -8px !important; margin-bottom: -8px !important; }
     [data-hdr] { padding-top: calc(env(safe-area-inset-top, 0px) + 51px) !important; }
     [data-mtop] { padding-top: calc(env(safe-area-inset-top, 0px) + 145px) !important; }
     [data-mtop-in] { margin-top: calc(-1 * (env(safe-area-inset-top, 0px) + 145px)) !important; padding-top: calc(env(safe-area-inset-top, 0px) + 145px) !important; }
@@ -840,7 +840,7 @@ class Component extends DCLogic {
   };
 
   componentDidMount() {
-    setTimeout(() => { (window.requestIdleCallback || ((f) => setTimeout(f, 1)))(() => { try { this.preloadThumbs(null); } catch (e) {} }); }, 4000);
+    if (!this._narrow && window.innerWidth > 700 && !(navigator.connection && navigator.connection.saveData)) { const pre = () => setTimeout(() => { (window.requestIdleCallback || ((f) => setTimeout(f, 1)))(() => { try { this.preloadThumbs(null); } catch (e) {} }); }, 4000); if (document.readyState === "complete") pre(); else window.addEventListener("load", pre, { once: true }); }
     if (this.state.view === "archive") this.scanBlack();
     const halWait = /[?&]hal\b/.test(location.search) ? 4000 : 100000;
     this._halLast = Date.now();
@@ -2049,7 +2049,7 @@ class Component extends DCLogic {
 
   thumb(vid, raw) {
     if (raw && isYT(vid)) return ytThumb(vid);
-    if (raw) return !vid ? "" : MUX.has(vid) ? "https://image.mux.com/" + vid + "/thumbnail.jpg?width=1600&time=" + (THUMB_AT[vid] != null ? THUMB_AT[vid] : 3) : "";
+    if (raw) return !vid ? "" : MUX.has(vid) ? "https://image.mux.com/" + vid + "/thumbnail.jpg?width=" + (window.innerWidth <= 700 ? 1000 : 1600) + "&time=" + (THUMB_AT[vid] != null ? THUMB_AT[vid] : 3) : "";
     if (vid && IMG[vid]) return IMG[vid];
     const row = vid && (ARCHIVE.find((r) => r.vid === vid) || FEATURED.find((r) => r.vid === vid));
     if (row && /celebrity/i.test(row.title || "")) return (LIVE ? "/" : "") + "assets/thumbs/celebrity.jpg";
@@ -2059,7 +2059,7 @@ class Component extends DCLogic {
     if (row && /volvo/i.test(row.title || "")) return (LIVE ? "/" : "") + "assets/thumbs/volvo.jpg";
     return this.thumbRaw(vid);
   }
-  thumbRaw(vid) { if (isYT(vid)) return ytThumb(vid); return !vid ? "" : MUX.has(vid) ? "https://image.mux.com/" + vid + "/thumbnail.jpg?width=1600&time=" + (THUMB_AT[vid] != null ? THUMB_AT[vid] : 3) : ""; }
+  thumbRaw(vid) { if (isYT(vid)) return ytThumb(vid); return !vid ? "" : MUX.has(vid) ? "https://image.mux.com/" + vid + "/thumbnail.jpg?width=" + (window.innerWidth <= 700 ? 1000 : 1600) + "&time=" + (THUMB_AT[vid] != null ? THUMB_AT[vid] : 3) : ""; }
 
   injectSEO() {
     const seen = new Set(), items = [];
