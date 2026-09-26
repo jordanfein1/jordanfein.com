@@ -764,21 +764,24 @@ class Component extends DCLogic {
     const down = (ev) => { if (ev.button || ev.target.closest("a,input,textarea,select") || (ev.target.closest("button") && !ev.target.closest("[data-tagbar]"))) return; const r = canvas.getBoundingClientRect(); RP.push({ x: ev.clientX - r.left, y: ev.clientY - r.top, t: 0 }); if (RP.length > 4) RP.shift(); };
     host.addEventListener("mousemove", move); host.addEventListener("mouseleave", leave); host.addEventListener("pointerdown", down);
     const slow = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches ? 0.2 : 1;
-    let raf, vis = true, t = 0, last = performance.now();
+    let raf, vis = true, t = 0, last = performance.now(), fr = 0, BX = [], scrolled = true, dead = false;
     const io = new IntersectionObserver((es) => { vis = es[0].isIntersecting; }); io.observe(canvas);
     const R = 153, R2 = R * R;
     const loop = (now) => {
       raf = requestAnimationFrame(loop);
+      if (!vis || document.hidden || !W) { last = now; return; }
+      const calm = !m.on && !RP.length && m.v < 0.01;
+      if (calm && now - last < 32) return;
       const dt = Math.min(0.05, (now - last) / 1000); last = now;
-      if (!vis || document.hidden || !W) return;
+      fr++;
       t += dt * slow;
       const sp = m.on && m.px > -9000 ? Math.hypot(m.x - m.px, m.y - m.py) : 0;
       m.v += (Math.min(1, sp / 18) - m.v) * 0.2; m.px = m.x; m.py = m.y;
       for (let k = RP.length - 1; k >= 0; k--) { RP[k].t += dt; if (RP[k].t > 2.6) RP.splice(k, 1); }
-      const tb = host.querySelector("[data-tagbar]"); const BX = [];
-      if (tb) { const cr = canvas.getBoundingClientRect(); for (const b of tb.querySelectorAll("button")) { const r = b.getBoundingClientRect(); if (r.width) BX.push([r.left - cr.left, r.top - cr.top, r.right - cr.left, r.bottom - cr.top]); } }
+      if (fr % 8 === 1 || scrolled) { scrolled = false; BX = []; const tb = host.querySelector("[data-tagbar]"); if (tb) { const cr = canvas.getBoundingClientRect(); for (const b of tb.querySelectorAll("button")) { const r = b.getBoundingClientRect(); if (r.width) BX.push([r.left - cr.left, r.top - cr.top, r.right - cr.left, r.bottom - cr.top]); } } }
       ctx.clearRect(0, 0, W, H);
       ctx.fillStyle = "#e8e2d6";
+      const pIn = new Path2D(), pOut = new Path2D();
       for (const p of P) {
         const sx = Math.sin(p.hy * 0.018 + t * 0.3) * 2.2 + Math.sin(p.hx * 0.006 + t * 0.18) * 1.2;
         const sy = Math.cos(p.hx * 0.016 + t * 0.25) * 1.6;
@@ -794,15 +797,17 @@ class Component extends DCLogic {
         p.ox += p.vx * slow; p.oy += p.vy * slow;
         x = x0 + p.ox; y = y0 + p.oy;
         let inBox = false; for (const b of BX) if (x >= b[0] && x <= b[2] && y >= b[1] && y <= b[3]) { inBox = true; break; }
-        const al = inBox ? 0.078 : 0.26;
-        if (al < 0.01) continue;
-        ctx.globalAlpha = Math.min(0.9, al);
-        ctx.beginPath(); ctx.arc(x, y, 0.8, 0, 6.283); ctx.fill();
+        const pp = inBox ? pIn : pOut; pp.moveTo(x + 0.8, y); pp.arc(x, y, 0.8, 0, 6.283);
       }
+      ctx.globalAlpha = 0.26; ctx.fill(pOut);
+      ctx.globalAlpha = 0.078; ctx.fill(pIn);
       ctx.globalAlpha = 1;
     };
-    raf = requestAnimationFrame(loop);
-    return () => { cancelAnimationFrame(raf); ro.disconnect(); io.disconnect(); host.removeEventListener("mousemove", move); host.removeEventListener("mouseleave", leave); host.removeEventListener("pointerdown", down); };
+    const onScr = () => { scrolled = true; }; window.addEventListener("scroll", onScr, { passive: true });
+    const start = () => { if (dead) return; last = performance.now(); raf = requestAnimationFrame(loop); };
+    const kick = () => (window.requestIdleCallback ? requestIdleCallback(start, { timeout: 1500 }) : setTimeout(start, 300));
+    if (document.readyState === "complete") kick(); else window.addEventListener("load", kick, { once: true });
+    return () => { dead = true; window.removeEventListener("scroll", onScr); cancelAnimationFrame(raf); ro.disconnect(); io.disconnect(); host.removeEventListener("mousemove", move); host.removeEventListener("mouseleave", leave); host.removeEventListener("pointerdown", down); };
   }
   cursorRef = React.createRef();
   contactRef = React.createRef();
@@ -2066,7 +2071,7 @@ class Component extends DCLogic {
 
   thumb(vid, raw) {
     if (raw && isYT(vid)) return ytThumb(vid);
-    if (raw) return !vid ? "" : MUX.has(vid) ? "https://image.mux.com/" + vid + "/thumbnail.jpg?width=" + (window.innerWidth <= 700 ? 1000 : 1600) + "&time=" + (THUMB_AT[vid] != null ? THUMB_AT[vid] : 3) : "";
+    if (raw) return !vid ? "" : MUX.has(vid) ? "https://image.mux.com/" + vid + "/thumbnail.jpg?width=" + (window.innerWidth <= 700 ? 1000 : 1280) + "&time=" + (THUMB_AT[vid] != null ? THUMB_AT[vid] : 3) : "";
     if (vid && IMG[vid]) return IMG[vid];
     const row = vid && (ARCHIVE.find((r) => r.vid === vid) || FEATURED.find((r) => r.vid === vid));
     if (row && /celebrity/i.test(row.title || "")) return (LIVE ? "/" : "") + "assets/thumbs/celebrity.jpg";
@@ -2076,7 +2081,7 @@ class Component extends DCLogic {
     if (row && /volvo/i.test(row.title || "")) return (LIVE ? "/" : "") + "assets/thumbs/volvo.jpg";
     return this.thumbRaw(vid);
   }
-  thumbRaw(vid) { if (isYT(vid)) return ytThumb(vid); return !vid ? "" : MUX.has(vid) ? "https://image.mux.com/" + vid + "/thumbnail.jpg?width=" + (window.innerWidth <= 700 ? 1000 : 1600) + "&time=" + (THUMB_AT[vid] != null ? THUMB_AT[vid] : 3) : ""; }
+  thumbRaw(vid) { if (isYT(vid)) return ytThumb(vid); return !vid ? "" : MUX.has(vid) ? "https://image.mux.com/" + vid + "/thumbnail.jpg?width=" + (window.innerWidth <= 700 ? 1000 : 1280) + "&time=" + (THUMB_AT[vid] != null ? THUMB_AT[vid] : 3) : ""; }
 
   injectSEO() {
     const seen = new Set(), items = [];
