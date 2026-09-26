@@ -925,6 +925,7 @@ class Component extends DCLogic {
       if (rk === this._routeKey) return;
       this._routeKey = rk;
       const hv = (location.hash || "").replace("#", "");
+      if (LIVE && hv === "archive" && /^\/library(\/|$)/.test(location.pathname)) { try { history.replaceState(null, "", location.pathname); } catch (e) {} this._routeKey = location.pathname; return; }
       const lt = LIVE && !hv ? tagFromPath() : null;
       if (lt) {
         this.setLibMeta(lt);
@@ -2051,11 +2052,11 @@ class Component extends DCLogic {
     if (raw) return !vid ? "" : MUX.has(vid) ? "https://image.mux.com/" + vid + "/thumbnail.jpg?width=1600&time=" + (THUMB_AT[vid] != null ? THUMB_AT[vid] : 3) : "";
     if (vid && IMG[vid]) return IMG[vid];
     const row = vid && (ARCHIVE.find((r) => r.vid === vid) || FEATURED.find((r) => r.vid === vid));
-    if (row && /celebrity/i.test(row.title || "")) return "assets/thumbs/celebrity.jpg";
-    if (row && /land rover/i.test(row.title || "")) return "assets/thumbs/land-rover.jpg";
-    if (row && /team usa/i.test(row.title || "")) return "assets/thumbs/team-usa-sm.jpg";
-    if (row && /chevy|chevrolet/i.test(row.title || "")) return "assets/thumbs/chevy-sm.jpg";
-    if (row && /volvo/i.test(row.title || "")) return "assets/thumbs/volvo.jpg";
+    if (row && /celebrity/i.test(row.title || "")) return (LIVE ? "/" : "") + "assets/thumbs/celebrity.jpg";
+    if (row && /land rover/i.test(row.title || "")) return (LIVE ? "/" : "") + "assets/thumbs/land-rover.jpg";
+    if (row && /team usa/i.test(row.title || "")) return (LIVE ? "/" : "") + "assets/thumbs/team-usa-sm.jpg";
+    if (row && /chevy|chevrolet/i.test(row.title || "")) return (LIVE ? "/" : "") + "assets/thumbs/chevy-sm.jpg";
+    if (row && /volvo/i.test(row.title || "")) return (LIVE ? "/" : "") + "assets/thumbs/volvo.jpg";
     return this.thumbRaw(vid);
   }
   thumbRaw(vid) { if (isYT(vid)) return ytThumb(vid); return !vid ? "" : MUX.has(vid) ? "https://image.mux.com/" + vid + "/thumbnail.jpg?width=1600&time=" + (THUMB_AT[vid] != null ? THUMB_AT[vid] : 3) : ""; }
