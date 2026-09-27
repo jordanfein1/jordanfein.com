@@ -669,6 +669,7 @@ function scanBlackOpenings(ids) {
 
 function slugify(s) { return String(s || "").toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/&/g, " and ").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "project"; }
 const PAGES = new Set(["adobe","brad-pitt-around-the-table","carlos-sainz","celebrity","chevy","choctaw","choctaw-2","comerica","detect-the-sos","first-financial","formula-1","formula-1-drivers","forrest-gump","i-survived","i-survived-9-11","i-survived-a-face-transplant","jackie-chan","jerry-seinfeld-and-jim-gaffigan","kat-dennings","keanu-reeves-keke-palmer-seth-rogen-and-aziz-ansari","kevin-hart","land-rover","matt-damon-casey-affleck","new-york-city-ballet","novant","peace-steve-documentary-short","penn-state-health","pennstate-health","pennstate-health-hockey","pennstate-health-woods","pointcard","rakuten","ralph-fiennes","ron-howard","scienceu","sofia-vergara","squarespace","starbucks","summa-health","team-usa-soccer","the-blessing-trailer","uc-davis","uc-davis-dance","verizon","volvo","who-cares-trailer"]);
+function showTitle(t) { return /^the blessing trailer$/i.test(String(t || "").trim()) ? "The Blessing" : t; }
 function slugHref(r) {
   const used = {};
   for (let i = 0; i < ARCHIVE.length; i++) {
@@ -2794,7 +2795,7 @@ class Component extends DCLogic {
           indexRows: rows.map((r, j) => ({
             key: "ix-" + s.indexTag + "-" + s.sortKey + s.sortDir + "-" + r.i,
             num: String(r.i + 1).padStart(2, "0"),
-            client: split(r).client,
+            client: showTitle(split(r).client),
             name: split(r).name,
             kind: kindsOf(r.kind).join(" / "),
             year: r.year === "—" ? "" : r.year,
