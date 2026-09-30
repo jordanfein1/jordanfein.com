@@ -1551,7 +1551,7 @@ class Component extends DCLogic {
   featEnd(cur) {
     if (!cur) return 0;
     if (/chevy/i.test(cur.title)) return 8.5;
-    if (/blessing/i.test(cur.title)) return 20.9;
+    if (/blessing/i.test(cur.title)) return (THUMB_AT[cur.vid] != null ? THUMB_AT[cur.vid] : 12.6) + 8.3;
     return 0;
   }
 
