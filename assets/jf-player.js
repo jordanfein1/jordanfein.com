@@ -21,9 +21,11 @@
     var pt = parseFloat(box.getAttribute("data-time")) || 0; if (pt < 1) { var og = document.querySelector('meta[property="og:image"]'); var om = og && /time=([\d.]+)/.exec(og.content || ""); pt = om ? parseFloat(om[1]) : 3; }
     var poster = "https://image.mux.com/" + id + "/thumbnail.webp?width=1920&time=" + pt;
     if (getComputedStyle(box).position === "static") box.style.position = "relative"; box.style.background = "#000"; box.style.overflow = "hidden";
-    var v = el("video", "position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:block;");
-    v.setAttribute("playsinline", ""); v.setAttribute("preload", "metadata"); v.poster = poster; v.setAttribute("aria-label", title);
-    box.appendChild(v);
+    var v = box.querySelector("video");
+    if (v) { v.removeAttribute("controls"); v.controls = false; v.style.cssText = "position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:block;"; }
+    else v = el("video", "position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:block;");
+    v.setAttribute("playsinline", ""); v.setAttribute("preload", "metadata"); if (!v.getAttribute("poster")) v.poster = poster; v.setAttribute("aria-label", title);
+    if (!v.parentNode) box.appendChild(v);
     var phone = /iphone|ipod|android.*mobile/i.test(navigator.userAgent) || (window.matchMedia && matchMedia("(max-width: 700px)").matches);
     if (phone && /iphone|ipod/i.test(navigator.userAgent)) { v.removeAttribute("playsinline"); v.removeAttribute("webkit-playsinline"); v.playsInline = false; }
     if (phone && v.canPlayType("application/vnd.apple.mpegurl")) { v.src = "https://stream.mux.com/" + id + ".m3u8"; v._ready = true; }
