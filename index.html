@@ -711,7 +711,7 @@ function libTitle(t) { return t == null ? HOME_TITLE : t === "All" ? "Library | 
 function libDesc(t) { return t == null ? HOME_DESC : t === "All" ? "The full library of commercial, celebrity, real people and editorial work directed by Jordan Fein, film and commercial director based in New York and Los Angeles." : t + " work directed by Jordan Fein, film and commercial director based in New York and Los Angeles."; }
 
 function applySheet(text) {
-  text = text.replace(/("New York City Ballet",[^\n]*?,"[^"]*?)Client: Entertainment Weekly/, "$1Client: People").replace(/("New York City Ballet",[^\n]*?,"[^"]*?)Awards: Webby[^"\n]*/, "$1Recognition: 2026 Webby Winner + People\'s Voice Winner — Health, Wellness & Fitness").replace(/Recognition: 2026 New York Emmy Nominee — Human Interest, Long Form Content/, "Recognition: 2026 New York Emmy Nominee — Human Interest, Long Form Content");
+  text = text.replace(/("New York City Ballet",[^\n]*?,"[^"]*?)Client: (?:Entertainment Weekly|People Magazine)/, "$1Client: People").replace(/("New York City Ballet",[^\n]*?,"[^"]*?)Awards: Webby[^"\n]*/, "$1Recognition: 2026 Webby Winner + People\'s Voice Winner — Health, Wellness & Fitness").replace(/("I Survived a Face Transplant",[^\n]*?,"[^"]*?)Recognition: New York Emmy Awards Nominee[^"\n]*/, "$1Recognition: 2026 New York Emmy Nominee — Human Interest, Long Form Content");
   text = text.replace(/Richardo Acosta/g, "Ricardo Acosta").replace(/Lance Edmonds/g, "Lance Edmands").replace(/Who Care Trailer/g, "Who Cares Trailer").replace(/Minneapolis St Paul/g, "Minneapolis St. Paul").replace(/Travel\+Leisure/g, "Travel + Leisure").replace(/Best Of Fest/g, "Best of Fest").replace(/Best Coverage Of Native America/g, "Best Coverage of Native America").replace(/Production co\b\.?/gi, "Production Co.");
   const rows = parseCSV(text);
   if (!rows.length) return false;
@@ -989,7 +989,7 @@ class Component extends DCLogic {
     window.addEventListener("popstate", route);
     this._keys = (e) => {
       if (e.key === "Escape" && this.state.popup) { this.closePopup(); return; }
-      if (this.state.view !== "work") return;
+      if (this.state.view !== "work" || !FEATURED.length) return;
       if (e.key === "ArrowRight") this.pick((this.state.index + 1) % FEATURED.length);
       if (e.key === "ArrowLeft") this.pick((this.state.index + FEATURED.length - 1) % FEATURED.length);
     };
@@ -1558,6 +1558,7 @@ class Component extends DCLogic {
   startAdvance() {
     clearTimeout(this._advTimer);
     clearInterval(this._endWatch);
+    if (!FEATURED.length) { if (this.state.advancing) this.setState({ advancing: false }); return; }
     const endAt = this.featEnd(FEATURED[this.state.index]);
     if (endAt) {
       const idx = this.state.index;
@@ -1628,7 +1629,7 @@ class Component extends DCLogic {
     clearTimeout(this._playTimer);
     clearTimeout(this._dwellTimer);
     clearTimeout(this._popTimer);
-    clearTimeout(this._advTimer);
+    clearTimeout(this._advTimer); clearInterval(this._endWatch);
     clearTimeout(this._chromeTimer);
     clearTimeout(this._watchTimer);
     clearTimeout(this._railTimer);
@@ -2212,7 +2213,7 @@ class Component extends DCLogic {
       const hd = (rows[0] || []).map((x) => x.toLowerCase()); let ci = hd.findIndex((x) => /playback|mux|\bid\b/.test(x)); if (ci < 0) ci = 1;
       const ids = rows.slice(1).map((r) => (r[ci] || "").trim()).filter((x) => x && !(ytParse(x) && !/stream\.mux\.com/.test(x)));
       if (!ids.length) return t;
-      return Promise.all(ids.map((id) => fetch("https://stream.mux.com/" + id + ".m3u8", { method: "HEAD" }).then((r) => [id, r.ok]).catch(() => [id, false]))).then((res) => {
+      return Promise.all(ids.map((id) => fetch("https://stream.mux.com/" + id + ".m3u8", { method: "HEAD" }).then((r) => [id, r.status < 400 || r.status >= 500]).catch(() => [id, true]))).then((res) => {
         const bad = new Set(res.filter((x) => !x[1]).map((x) => x[0]));
         if (bad.size) console.warn("Mux: skipping rows with invalid Playback IDs:", Array.from(bad));
         if (bad.size === ids.length && ids.length === rows.slice(1).filter((r) => (r[ci] || "").trim()).length) return "";
@@ -2301,7 +2302,7 @@ class Component extends DCLogic {
         ["loadedmetadata", "loadeddata", "canplay"].forEach((e) => v.addEventListener(e, kick));
         if (!this._touchKick) {
           this._touchKick = true;
-          const any = () => { document.querySelectorAll("video[data-mux]").forEach((x) => { if (x._muxId && x.paused && (x.getAttribute("data-active") === "1" || !x.hasAttribute("data-slot"))) { if (x.getAttribute("data-muted") !== "0") x.muted = true; x.play().catch(() => {}); } }); };
+          const any = () => { document.querySelectorAll("video[data-mux]").forEach((x) => { if (x._muxId && x.paused && x.getAttribute("data-muted") !== "0" && (x.getAttribute("data-active") === "1" || !x.hasAttribute("data-slot"))) { if (x.getAttribute("data-muted") !== "0") x.muted = true; x.play().catch(() => {}); } }); };
           ["touchstart", "touchend", "scroll", "pointerdown"].forEach((e) => window.addEventListener(e, any, { passive: true }));
         }
       }
