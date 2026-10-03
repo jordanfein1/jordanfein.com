@@ -2210,6 +2210,8 @@ class Component extends DCLogic {
   syncSlots() {
     const vids = document.querySelectorAll("video[data-slot]");
     if (vids.length < 2) return;
+    const hold = !!this.state.popup; // popup open: pause the reel so it doesn't compete with the popup stream
+    const phone = this._phoneUA != null ? this._phoneUA : (this._phoneUA = /iphone|ipod|android.*mobile/i.test(navigator.userAgent));
     vids.forEach((v) => {
       const on = v.getAttribute("data-active") === "1";
       if (!v._slotBound) {
@@ -2235,6 +2237,18 @@ class Component extends DCLogic {
       }
       if (on) {
         clearTimeout(v._outT);
+        if (hold) { if (!v.paused) { try { v.pause(); } catch (e) {} } return; }
+        if (phone && this._slotActive && this._slotActive !== v) {
+          // Phones: iOS won't reliably start a second stream behind the playing one, so hand over immediately
+          // (poster shows until the new clip's first frame) instead of waiting for the crossfade.
+          const prev = this._slotActive;
+          try { prev.pause(); } catch (e) {}
+          prev.style.opacity = "0"; prev.style.zIndex = "0";
+          v.style.transition = "none"; v.style.filter = "none"; v.style.zIndex = "1"; v.style.opacity = "1";
+          this._heroIn = true;
+          const ps = document.querySelector("[data-hero-poster]"); if (ps) ps.style.opacity = "0";
+        }
+        this._slotActive = v;
         if (v.paused && v.readyState >= 2) v.play().catch(() => {});
         if (!v.paused && v.readyState >= 3) { v.style.zIndex = "1"; v.style.opacity = "1"; }
       } else {
@@ -2275,21 +2289,23 @@ class Component extends DCLogic {
       v.setAttribute("autoplay", "");
       if (!v._kick) {
         v._kick = true;
-        const kick = () => { if (v._muxId && v.paused && (v.getAttribute("data-active") === "1" || !v.hasAttribute("data-slot"))) { if (v.getAttribute("data-muted") !== "0") v.muted = true; v.play().catch(() => {}); } };
+        const kick = () => { if (this.state.popup && v.hasAttribute("data-slot")) return; if (v._muxId && v.paused && (v.getAttribute("data-active") === "1" || !v.hasAttribute("data-slot"))) { if (v.getAttribute("data-muted") !== "0") v.muted = true; v.play().catch(() => {}); } };
         ["loadedmetadata", "loadeddata", "canplay"].forEach((e) => v.addEventListener(e, kick));
         if (!this._touchKick) {
           this._touchKick = true;
-          const any = () => { document.querySelectorAll("video[data-mux]").forEach((x) => { if (x._muxId && x.paused && x.getAttribute("data-muted") !== "0" && (x.getAttribute("data-active") === "1" || !x.hasAttribute("data-slot"))) { if (x.getAttribute("data-muted") !== "0") x.muted = true; x.play().catch(() => {}); } }); };
+          const any = () => { if (this.state.popup) return; document.querySelectorAll("video[data-mux]").forEach((x) => { if (x._muxId && x.paused && x.getAttribute("data-muted") !== "0" && (x.getAttribute("data-active") === "1" || !x.hasAttribute("data-slot"))) { if (x.getAttribute("data-muted") !== "0") x.muted = true; x.play().catch(() => {}); } }); };
           ["touchstart", "touchend", "scroll", "pointerdown"].forEach((e) => window.addEventListener(e, any, { passive: true }));
         }
       }
       if (v.getAttribute("data-hq") === "1") v.addEventListener("loadedmetadata", () => { if (v.videoWidth && v.videoHeight) { this._vasp = this._vasp || {}; this._vasp[id] = v.videoWidth / v.videoHeight; if (this.state.popup && this.state.popup.vid === id && !(this._asp && this._asp[id])) this.forceUpdate(); } }, { once: true });
       const startAt = v.getAttribute("data-muted") !== "0" ? (id === "trqeWigbiCfR52ABMhpUZlJmdeT4ela7XTWYyE8gKSw" ? Math.max(0, (THUMB_AT[id] != null ? THUMB_AT[id] : 20.9) - 8.3) : THUMB_AT[id] != null ? THUMB_AT[id] : blackSkip(id)) : 0;
       if (startAt) v.addEventListener("loadedmetadata", () => { if (v.currentTime < Math.min(0.5, startAt) && v.duration > startAt) v.currentTime = startAt; }, { once: true });
+      if (v.hasAttribute("data-slot") && /iphone|ipod|android.*mobile/i.test(navigator.userAgent) && !v.getAttribute("poster")) v.poster = "https://image.mux.com/" + id + "/thumbnail.webp?width=900&time=" + (startAt || 0);
       const hq = v.getAttribute("data-hq") === "1";
       const phone = /iphone|ipod|android.*mobile/i.test(navigator.userAgent) || (window.matchMedia && matchMedia("(max-width: 700px)").matches);
       const firstHero = hq && !this._heroIn;
-      const url = "https://stream.mux.com/" + id + ".m3u8" + (hq ? (phone ? "?max_resolution=720p&rendition_order=desc" : firstHero ? "?min_resolution=720p" : "?min_resolution=720p&rendition_order=desc") : "");
+      const popupVid = v.getAttribute("data-muted") === "0";
+      const url = "https://stream.mux.com/" + id + ".m3u8" + (hq ? (phone ? (popupVid ? "?min_resolution=540p&max_resolution=720p" : "?max_resolution=720p&rendition_order=desc") : firstHero ? "?min_resolution=720p" : "?min_resolution=720p&rendition_order=desc") : "");
       const go = () => {
         if (v._muxId !== id) return;
         const nativeHls = /^((?!chrome|android|crios|fxios).)*safari/i.test(navigator.userAgent) || /iphone|ipad/i.test(navigator.userAgent);
