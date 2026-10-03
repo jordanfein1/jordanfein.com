@@ -2305,7 +2305,7 @@ class Component extends DCLogic {
       const phone = /iphone|ipod|android.*mobile/i.test(navigator.userAgent) || (window.matchMedia && matchMedia("(max-width: 700px)").matches);
       const firstHero = hq && !this._heroIn;
       const popupVid = v.getAttribute("data-muted") === "0";
-      const url = "https://stream.mux.com/" + id + ".m3u8" + (hq ? (phone ? (popupVid ? "?min_resolution=540p&max_resolution=720p" : "?max_resolution=720p&rendition_order=desc") : firstHero ? "?min_resolution=720p" : "?min_resolution=720p&rendition_order=desc") : "");
+      const url = "https://stream.mux.com/" + id + ".m3u8" + (hq ? (phone ? (popupVid ? "?min_resolution=540p&max_resolution=720p" : "?max_resolution=720p&rendition_order=desc") : firstHero ? "?min_resolution=720p&max_resolution=1080p" : "?min_resolution=720p&max_resolution=1080p&rendition_order=desc") : "");
       const go = () => {
         if (v._muxId !== id) return;
         const nativeHls = /^((?!chrome|android|crios|fxios).)*safari/i.test(navigator.userAgent) || /iphone|ipad/i.test(navigator.userAgent);
