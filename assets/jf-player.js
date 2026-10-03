@@ -24,7 +24,7 @@
     var v = box.querySelector("video");
     if (v) { v.removeAttribute("controls"); v.controls = false; v.style.cssText = "position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:block;"; }
     else v = el("video", "position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:block;");
-    v.setAttribute("playsinline", ""); v.setAttribute("preload", "metadata"); if (!v.getAttribute("poster")) v.poster = poster; v.setAttribute("aria-label", title);
+    v.setAttribute("playsinline", ""); if (!v.querySelector("source")) v.setAttribute("preload", "metadata"); if (!v.getAttribute("poster")) v.poster = poster; v.setAttribute("aria-label", title);
     if (!v.parentNode) box.appendChild(v);
     var phone = /iphone|ipod|android.*mobile/i.test(navigator.userAgent) || (window.matchMedia && matchMedia("(max-width: 700px)").matches);
     if (phone && /iphone|ipod/i.test(navigator.userAgent)) { v.removeAttribute("playsinline"); v.removeAttribute("webkit-playsinline"); v.playsInline = false; }
@@ -60,6 +60,7 @@
       var url = "https://stream.mux.com/" + id + ".m3u8";
       loadHls(function (Hls) {
         if (Hls && Hls.isSupported()) { var h = new Hls({ capLevelToPlayerSize: true, startLevel: -1 }); h.loadSource(url); h.attachMedia(v); }
+        else if (!v.canPlayType("application/vnd.apple.mpegurl") && v.querySelector('source[type="video/mp4"]')) { /* hls.js unavailable: let the browser play the static MP4 */ }
         else v.src = url;
         v._ready = true; cb();
       });
