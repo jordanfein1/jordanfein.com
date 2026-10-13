@@ -17,6 +17,41 @@
   function el(tag, css, html) { var e = document.createElement(tag); if (css) e.style.cssText = css; if (html != null) e.innerHTML = html; return e; }
   function btnCss() { return "cursor:pointer;background:transparent;border:0;padding:10px 0;color:" + CREAM + ";font-family:" + MONO + ";font-size:11px;letter-spacing:0.18em;text-transform:uppercase;white-space:nowrap;min-height:44px;"; }
 
+
+  // Letterbox detection (same approach as the homepage): sample 3 poster frames, trim black rows/cols, resize the 16:9 box to the picture.
+  function fitBars(box, v, id, pt) {
+    var wrap = box.parentNode; if (!wrap || !/aspect-ratio/.test(wrap.getAttribute("style") || "")) return;
+    function measure(time) { return new Promise(function (res) {
+      var img = new Image(); img.crossOrigin = "anonymous";
+      img.onload = function () { try {
+        var W = 160, H = Math.round(160 * img.naturalHeight / img.naturalWidth);
+        var c = document.createElement("canvas"); c.width = W; c.height = H; var g = c.getContext("2d"); g.drawImage(img, 0, 0, W, H);
+        var d = g.getImageData(0, 0, W, H).data;
+        function lum(i) { return d[i] + d[i + 1] + d[i + 2]; }
+        function rowDark(y) { var s = 0, mx = 0; for (var x = 0; x < W; x++) { var q = lum((y * W + x) * 4); s += q; if (q > mx) mx = q; } return s / (W * 3) < 10 && mx < 60; }
+        function colDark(x) { var s = 0, mx = 0; for (var y = 0; y < H; y++) { var q = lum((y * W + x) * 4); s += q; if (q > mx) mx = q; } return s / (H * 3) < 10 && mx < 60; }
+        var t = 0; while (t < H / 3 && rowDark(t)) t++; var b = 0; while (b < H / 3 && rowDark(H - 1 - b)) b++;
+        var l = 0; while (l < W / 3 && colDark(l)) l++; var r = 0; while (r < W / 3 && colDark(W - 1 - r)) r++;
+        res({ W: W, H: H, t: t, b: b, l: l, r: r });
+      } catch (e) { res(null); } };
+      img.onerror = function () { res(null); };
+      img.src = "https://image.mux.com/" + id + "/thumbnail.jpg?width=320&time=" + time;
+    }); }
+    var t0 = pt || 3;
+    Promise.all([t0, t0 + 6, t0 + 14].map(measure)).then(function (ms) {
+      ms = ms.filter(Boolean); if (!ms.length) return;
+      var W = ms[0].W, H = ms[0].H;
+      function med(k) { var a = ms.map(function (m) { return m[k]; }).sort(function (x, y) { return x - y; }); return a.length >= 3 ? a[1] : a[0]; }
+      var tb = Math.min(med("t"), med("b")), lr = Math.min(med("l"), med("r"));
+      var cw = W - 2 * lr, ch = H - 2 * tb;
+      if (cw < W * 0.5 || ch < H * 0.5) return;
+      if (tb < 2 && lr < 2) return;
+      var a = cw / ch;
+      v._fitA = a;
+      wrap.style.aspectRatio = a.toFixed(4);
+      v.style.objectFit = "cover";
+    });
+  }
   function mount(box) {
     var id = box.getAttribute("data-mux"), title = box.getAttribute("data-title") || "";
     var pt = parseFloat(box.getAttribute("data-time")) || 0; if (pt < 1) { var og = document.querySelector('meta[property="og:image"]'); var om = og && /time=([\d.]+)/.exec(og.content || ""); pt = om ? parseFloat(om[1]) : 3; }
@@ -27,6 +62,7 @@
     else v = el("video", "position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:block;");
     v.setAttribute("playsinline", ""); v.setAttribute("preload", "metadata"); if (!v.getAttribute("poster")) v.poster = poster; v.setAttribute("aria-label", title);
     if (!v.parentNode) box.appendChild(v);
+    fitBars(box, v, id, pt);
     var phone = /iphone|ipod|android.*mobile/i.test(navigator.userAgent) || (window.matchMedia && matchMedia("(max-width: 700px)").matches);
     if (phone && /iphone|ipod/i.test(navigator.userAgent)) { v.removeAttribute("playsinline"); v.removeAttribute("webkit-playsinline"); v.playsInline = false; }
 
@@ -119,7 +155,7 @@
     function flush() { if (wSec < 1) return; var d = v.duration || 0; ev("video_watch_time", { watch_seconds: Math.round(wSec), video_duration: Math.round(d), percent_watched: d ? Math.min(100, Math.round(wSec / d * 100)) : 0, transport_type: "beacon" }); wSec = 0; }
     window.addEventListener("pagehide", flush);
     document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") flush(); });
-    document.addEventListener("fullscreenchange", function () { fs.textContent = document.fullscreenElement === box ? "Exit full screen" : "Full screen"; v.style.objectFit = "contain"; });
+    document.addEventListener("fullscreenchange", function () { var full = document.fullscreenElement === box; fs.textContent = full ? "Exit full screen" : "Full screen"; v.style.objectFit = full || !v._fitA ? "contain" : "cover"; });
     box.tabIndex = 0;
     box.addEventListener("keydown", function (e) { if (e.code === "Space" || e.key === "k") { e.preventDefault(); toggle(); } else if (e.key === "f") fs.onclick(e); else if (e.key === "m") snd.onclick(e); });
   }
