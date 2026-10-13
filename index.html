@@ -2095,6 +2095,42 @@ class Component extends DCLogic {
   }
 
 
+  nativePlay(rec) {
+    const id = rec && rec.vid; if (!id || isYT(id)) return false;
+    let v = this._nv;
+    if (!v) {
+      v = document.createElement("video");
+      v.setAttribute("preload", "auto"); v.controls = true;
+      v.style.cssText = "position:fixed;left:0;top:0;width:2px;height:2px;opacity:0.01;pointer-events:none;z-index:-1;background:#000;";
+      document.body.appendChild(v); this._nv = v;
+      const stop = () => { try { v.pause(); } catch (e) {} if (v._hls) { v._hls.destroy(); v._hls = null; } v.removeAttribute("src"); try { v.load(); } catch (e) {} };
+      v.addEventListener("webkitendfullscreen", stop);
+      document.addEventListener("fullscreenchange", () => { if (!document.fullscreenElement && v._fs) { v._fs = false; stop(); } });
+      v.addEventListener("ended", () => { try { if (v.webkitExitFullscreen) v.webkitExitFullscreen(); else if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen(); } catch (e) {} });
+    }
+    if (v._hls) { v._hls.destroy(); v._hls = null; }
+    const ios = /iphone|ipod|ipad/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    const t = THUMB_AT[id] != null ? THUMB_AT[id] : 0;
+    v.poster = "https://image.mux.com/" + id + "/thumbnail.jpg?width=1200&time=" + t;
+    v.muted = false;
+    if (ios) {
+      v.removeAttribute("playsinline"); v.removeAttribute("webkit-playsinline"); v.playsInline = false;
+      v.src = "https://stream.mux.com/" + id + ".m3u8";
+      const p = v.play(); if (p && p.catch) p.catch(() => {});
+      const go = () => { try { if (!v.webkitDisplayingFullscreen) v.webkitEnterFullscreen(); } catch (e) {} };
+      if (v.readyState >= 1) go(); else v.addEventListener("loadedmetadata", go, { once: true });
+    } else {
+      v.setAttribute("playsinline", "");
+      if (window.Hls && window.Hls.isSupported()) { const hl = new window.Hls({ capLevelToPlayerSize: true, startLevel: -1 }); hl.loadSource("https://stream.mux.com/" + id + ".m3u8"); hl.attachMedia(v); v._hls = hl; }
+      else v.src = "https://stream.mux.com/" + id + "/highest.mp4";
+      const req = v.requestFullscreen || v.webkitRequestFullscreen;
+      if (req) { try { v._fs = true; const fp = req.call(v); if (fp && fp.catch) fp.catch(() => { v._fs = false; }); } catch (e) { v._fs = false; } }
+      const p = v.play(); if (p && p.catch) p.catch(() => {});
+    }
+    if (window.gtag) gtag("event", "video_play", { video_title: rec.title, video_id: id, page: "home" });
+    return true;
+  }
+
   closePopup() {
     if (!this.state.popup || this.state.popClosing) return;
     clearTimeout(this._popCloseT);
@@ -2696,7 +2732,7 @@ class Component extends DCLogic {
         }
         this.stopAdvance();
         const rec = ARCHIVE.find((r) => r.vid === cur.vid) || { title: cur.title, kind: cur.subtitle, vid: cur.vid };
-        this.setState({ popup: rec, popFromWork: true, credits: false, cursor: "close", chrome: true, sound: false });
+        if (this._narrow && this.nativePlay(rec)) return; this.setState({ popup: rec, popFromWork: true, credits: false, cursor: "close", chrome: true, sound: false });
         this.showChrome();
       },
 
@@ -2776,6 +2812,7 @@ class Component extends DCLogic {
         open: () => {
           if (!r.vid) return;
           this.clearTimers();
+          if (this._narrow && this.nativePlay(r)) return;
           this.setState({ hovered: i, popup: r, credits: false, cursor: "close", previewPlaying: false, dwell: false, chrome: true });
           this.showChrome();
         }
@@ -2840,7 +2877,7 @@ class Component extends DCLogic {
             cursor: r.vid ? "pointer" : "default",
             hover: () => this.hoverIndex(r),
             href: slugHref(r) || "#archive",
-            open: (e) => { if (slugHref(r) || !r.vid) return; e.preventDefault(); this.clearTimers(); this.setState({ popup: r, credits: false, cursor: "close", previewPlaying: false, dwell: false, chrome: true }); this.showChrome(); }
+            open: (e) => { if (slugHref(r) || !r.vid) return; e.preventDefault(); this.clearTimers(); if (this._narrow && this.nativePlay(r)) return; this.setState({ popup: r, credits: false, cursor: "close", previewPlaying: false, dwell: false, chrome: true }); this.showChrome(); }
           })),
           leaveIndex: () => { clearTimeout(this._idxT); this.setState({ idxHover: -1, idxPlay: false }); },
           floatOpacity: hov && hov.vid && !s.popup ? 1 : 0,
