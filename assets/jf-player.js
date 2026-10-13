@@ -2,9 +2,10 @@
 (function () {
   var MONO = "'Courier Prime','Courier New',monospace";
   var CREAM = "#f2efe9";
+  // Native HLS only on real Safari/iOS. Chrome/Android answer "maybe" to canPlayType but then fail with SRC_NOT_SUPPORTED.
+  function nativeHls() { var t = document.createElement("video"); return !!t.canPlayType("application/vnd.apple.mpegurl") && /iphone|ipad|^((?!chrome|android|crios|fxios).)*safari/i.test(navigator.userAgent); }
   function loadHls(cb) {
-    var v = document.createElement("video");
-    if (v.canPlayType("application/vnd.apple.mpegurl") && /iphone|ipad|^((?!chrome|android|crios|fxios).)*safari/i.test(navigator.userAgent)) return cb(null);
+    if (nativeHls()) return cb(null);
     if (window.Hls) return cb(window.Hls);
     var s = document.createElement("script");
     s.src = "https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js";
@@ -60,14 +61,14 @@
       var url = "https://stream.mux.com/" + id + ".m3u8";
       loadHls(function (Hls) {
         if (Hls && Hls.isSupported()) { clearSources(); var h = new Hls({ capLevelToPlayerSize: true, startLevel: -1 }); h.loadSource(url); h.attachMedia(v); }
-        else if (!v.canPlayType("application/vnd.apple.mpegurl") && v.querySelector('source[type="video/mp4"]')) { /* hls.js unavailable: let the browser play the static MP4 */ }
-        else { clearSources(); v.src = url; }
+        else if (nativeHls()) { clearSources(); v.src = url; }
+        else { /* hls.js unavailable: let the browser play the static MP4 <source> */ }
         v._ready = true; cb();
       });
     }
     function start() {
       if (phone) {
-        if (!v._ready) { if (v.canPlayType("application/vnd.apple.mpegurl")) { clearSources(); v.src = "https://stream.mux.com/" + id + ".m3u8"; v._ready = true; } }
+        if (!v._ready && nativeHls()) { clearSources(); v.src = "https://stream.mux.com/" + id + ".m3u8"; v._ready = true; }
         if (v._ready) {
           started = true; v.muted = false; big.style.opacity = "0"; big.style.pointerEvents = "none";
           var pp = v.play(); if (pp && pp.catch) pp.catch(function () {});
