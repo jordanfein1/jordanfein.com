@@ -310,7 +310,7 @@
 
       <div data-libgrid="1" onMouseLeave="{{ leaveRows }}" style="position: relative; z-index: 2; margin: 0 -28px; display: grid; grid-template-columns: repeat(auto-fill, minmax(max(calc(33.333% - 0.1px), min(100%, 340px)), 1fr)); gap: 0;">
         <sc-for list="{{ archive }}" as="row" hint-placeholder-count="9">
-          <button key="{{ row.key }}" data-flip-key="{{ row.key }}" data-span="{{ row.span }}" onMouseEnter="{{ row.hover }}" onClick="{{ row.open }}" style="position: relative; display: block; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; cursor: pointer; border: 0; padding: 0; margin: 0; text-align: left; background-color: #101013; opacity: {{ row.itemOpacity }}; transform: {{ row.itemTransform }}; filter: {{ row.itemBlur }}; animation: {{ row.enterAnim }}; transition: opacity 0.55s cubic-bezier(0.4,0,0.2,1) {{ row.itemDelay }}, transform 0.55s cubic-bezier(0.4,0,0.2,1), filter 0.55s cubic-bezier(0.4,0,0.2,1) {{ row.itemDelay }}; will-change: transform, opacity;">
+          <button key="{{ row.key }}" data-flip-key="{{ row.key }}" data-span="{{ row.span }}" onMouseEnter="{{ row.hover }}" onPointerUp="{{ row.tap }}" onClick="{{ row.open }}" style="position: relative; display: block; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; cursor: pointer; border: 0; padding: 0; margin: 0; text-align: left; background-color: #101013; opacity: {{ row.itemOpacity }}; transform: {{ row.itemTransform }}; filter: {{ row.itemBlur }}; animation: {{ row.enterAnim }}; transition: opacity 0.55s cubic-bezier(0.4,0,0.2,1) {{ row.itemDelay }}, transform 0.55s cubic-bezier(0.4,0,0.2,1), filter 0.55s cubic-bezier(0.4,0,0.2,1) {{ row.itemDelay }}; will-change: transform, opacity;">
             <div style="position: absolute; inset: 0; background-image: {{ row.image }}; background-size: cover; background-position: {{ row.bgPos }}; transform-origin: {{ row.bgPos }}; filter: grayscale({{ row.gray }}) brightness({{ row.bright }}); transform: scale({{ row.zoomFill }}); transition: filter 0.6s ease, transform 1.4s cubic-bezier(0.16,1,0.3,1);"></div>
             <sc-if value="{{ row.playing }}" hint-placeholder-val="{{ false }}">
               <sc-if value="{{ row.isMux }}" hint-placeholder-val="{{ false }}">
@@ -1749,6 +1749,7 @@ class Component extends DCLogic {
   }
 
   hoverRow(i, row) {
+    if (this._narrow) return; // phones: tap goes straight to the native player, no preview/dwell
     if (this._attracting) { this._attracting = false; clearTimeout(this._attT); this.armIdle(); }
     else if (i === this.state.hovered && (this.state.previewPlaying || this._playTimer)) return;
     this.clearTimers();
@@ -2811,8 +2812,16 @@ class Component extends DCLogic {
         kindColor: i === this.state.hovered ? "#f2efe9" : "#8d8880",
         color: i === this.state.hovered ? "#ffffff" : "#d8d2c9",
         hover: () => this.hoverRow(i, r),
+        tap: (ev) => {
+          if (!this._narrow || !r.vid || (ev && ev.pointerType === "mouse")) return;
+          if (ev && ev.preventDefault) ev.preventDefault();
+          this._tapped = Date.now();
+          this.clearTimers();
+          this.nativePlay(r);
+        },
         open: () => {
           if (!r.vid) return;
+          if (this._tapped && Date.now() - this._tapped < 800) return; // already handled by pointerup
           this.clearTimers();
           if (this._narrow && this.nativePlay(r)) return;
           this.setState({ hovered: i, popup: r, credits: false, cursor: "close", previewPlaying: false, dwell: false, chrome: true });
