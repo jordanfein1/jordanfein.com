@@ -898,7 +898,7 @@ class Component extends DCLogic {
   };
 
   componentDidMount() {
-    if (/iphone|ipod|android.*mobile/i.test(navigator.userAgent) && window.innerWidth < 900 && this.state.view === "work" && FEATURED.length && MUX.has(FEATURED[this.state.index || 0].vid)) {
+    if (this.state.view === "work" && FEATURED.length && MUX.has(FEATURED[this.state.index || 0].vid)) {
       this.setState({ loading: true });
       const done = () => { if (this._loadDone) return; this._loadDone = true; clearTimeout(this._loadT); this._onHeroReady = null; this.setState({ loading: false }); this._loadGoneT = setTimeout(() => { this._loaderGone = true; this.forceUpdate(); }, 900); };
       this._loadT = setTimeout(done, 7000);
