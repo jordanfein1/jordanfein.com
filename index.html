@@ -901,7 +901,8 @@ class Component extends DCLogic {
     if (this.state.view === "work" && FEATURED.length && MUX.has(FEATURED[this.state.index || 0].vid)) {
       this.setState({ loading: true });
       const done = () => { if (this._loadDone) return; this._loadDone = true; clearTimeout(this._loadT); this._onHeroReady = null; this.setState({ loading: false }); this._loadGoneT = setTimeout(() => { this._loaderGone = true; this.forceUpdate(); }, 900); };
-      this._loadT = setTimeout(done, 7000);
+      this._loadPhone = /iphone|ipod|android.*mobile/i.test(navigator.userAgent) && window.innerWidth < 900;
+      this._loadT = setTimeout(done, this._loadPhone ? 7000 : 3500);
       this._onHeroReady = done;
     }
     requestAnimationFrame(() => requestAnimationFrame(() => { const s = document.querySelector("[data-jf-shell]"); if (s) s.remove(); }));
@@ -2349,9 +2350,9 @@ class Component extends DCLogic {
       if (startAt) v.addEventListener("loadedmetadata", () => { if (v.currentTime < Math.min(0.5, startAt) && v.duration > startAt) v.currentTime = startAt; }, { once: true });
       if (v.hasAttribute("data-slot") && /iphone|ipod|android.*mobile/i.test(navigator.userAgent) && !v.getAttribute("poster")) v.poster = "https://image.mux.com/" + id + "/thumbnail.webp?width=900&time=" + (startAt || 0);
       if (this._onHeroReady && v.getAttribute("data-active") === "1") {
-        const ready = () => { if (!this._onHeroReady) return; const b = v.buffered; const ahead = b.length ? b.end(b.length - 1) - v.currentTime : 0; if (v.readyState >= 4 || ahead > 5) this._onHeroReady(); };
+        const ready = () => { if (!this._onHeroReady) return; const b = v.buffered; const ahead = b.length ? b.end(b.length - 1) - v.currentTime : 0; if (v.readyState >= 4 || ahead > (this._loadPhone ? 5 : 2.5)) this._onHeroReady(); };
         ["canplaythrough", "progress", "playing", "timeupdate"].forEach((ev) => v.addEventListener(ev, ready));
-        setTimeout(() => { if (this._onHeroReady && v.readyState >= 3) this._onHeroReady(); }, 3500);
+        setTimeout(() => { if (this._onHeroReady && v.readyState >= 3) this._onHeroReady(); }, this._loadPhone ? 3500 : 1800);
       }
       const hq = v.getAttribute("data-hq") === "1";
       const phone = /iphone|ipod|android.*mobile/i.test(navigator.userAgent) || (window.matchMedia && matchMedia("(max-width: 700px)").matches);
