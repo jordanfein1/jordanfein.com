@@ -2814,7 +2814,7 @@ class Component extends DCLogic {
         color: i === this.state.hovered ? "#ffffff" : "#d8d2c9",
         hover: () => this.hoverRow(i, r),
         tap: (ev) => {
-          if (!this._narrow || !r.vid || (ev && ev.pointerType === "mouse")) return;
+          if (!this._narrow || !r.vid || (ev && ev.pointerType === "mouse") || isYT(r.vid)) return;
           if (ev && ev.preventDefault) ev.preventDefault();
           this._tapped = Date.now();
           this.clearTimers();
