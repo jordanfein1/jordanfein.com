@@ -338,7 +338,7 @@ function buildSeoBlock_(rows) {
     const bits = [cats.join(', ')].concat(parts).concat(awards.length ? ['Awards: ' + awards.join('; ')] : []).filter(Boolean);
     return '<li><a href="/work/' + s + '/">' + esc(title) + '</a>' + (bits.length ? ' — ' + esc(bits.join(' · ')) : '') + '</li>';
   }).filter(Boolean);
-  return '<h1>Jordan Fein, Director — Commercial, Documentary, Sports &amp; Unscripted</h1><p>Jordan Fein is a freelance commercial and documentary director based in New York and Los Angeles. He directs commercials, documentaries, sports and unscripted series for brands, agencies and publishers. Selected work directed by Jordan Fein:</p><ul>' + items.join('') + '</ul>';
+  return '<h1>Jordan Fein, Director — Commercial, Documentary, Sports &amp; Unscripted</h1><p>Jordan Fein is a freelance commercial and documentary director based in New York and Los Angeles. He directs commercials, documentaries, sports and unscripted series for brands, agencies and publishers. Selected work directed by Jordan Fein:</p>' + '<nav aria-label="Library by type"><a href="/library/">Library — all work</a> · <a href="/library/commercial/">Commercial</a> · <a href="/library/real-people/">Real People</a> · <a href="/library/celebrity/">Celebrity</a> · <a href="/library/health/">Health</a> · <a href="/library/sports/">Sports</a> · <a href="/library/automotive/">Automotive</a> · <a href="/library/editorial/">Editorial</a></nav>' + '<ul>' + items.join('') + '</ul>';
 }
 
 // Home page work list: links to the /work/ watch pages only. No VideoObject here — the home page is not a watch page,
@@ -386,7 +386,7 @@ function buildLlms_(rows) {
     '- Commercials and branded content for brands and agencies, including U.S. Soccer, Volvo, Land Rover, Chevy, Verizon, Squarespace, Adobe, Starbucks, Penn State Health and Formula 1',
     '- Documentary: The Blessing (feature documentary; PBS, WORLD, NHK Japan) and short documentaries for People, including the unscripted series I Survived',
     '- Celebrity and editorial film for People, Entertainment Weekly, InStyle and Travel + Leisure',
-    '- Sports: Team USA Soccer for U.S. Soccer, Formula 1 and Formula 1 drivers, Penn State Health hockey',
+    '- Sports: Team USA Soccer for U.S. Soccer, Formula 1 and Formula 1 drivers, the Penn State Health Super Bowl campaign, Penn State Health hockey',
     '- Health and real-people storytelling for hospital systems and health brands', '',
     '## Recognition',
     '- New York Emmy Award, Human Interest – Long Form Content (2026), for I Survived a Face Transplant (People)',
@@ -410,7 +410,8 @@ function buildLlms_(rows) {
     '- Celebrity: https://jordanfein.com/library/celebrity/',
     '- Editorial: https://jordanfein.com/library/editorial/',
     '- Health: https://jordanfein.com/library/health/',
-    '- Automotive: https://jordanfein.com/library/automotive/', '',
+    '- Automotive: https://jordanfein.com/library/automotive/',
+    '- Sports: https://jordanfein.com/library/sports/', '',
     '## Work (' + lines.length + ' projects, each with its own page)', ''].concat(lines).join('\n') + '\n';
 }
 
