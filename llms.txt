@@ -38,15 +38,15 @@
 
 ## Work (47 projects, each with its own page)
 
-- [Team USA Soccer](https://jordanfein.com/work/team-usa-soccer/): Commercial / Celebrity. Director: Jordan Fein. Client: U.S. Soccer. Production Co.: Alkemy X. DP: Zak Mulligan.
+- [Team USA Soccer](https://jordanfein.com/work/team-usa-soccer/): Commercial / Celebrity / Sports. Director: Jordan Fein. Client: U.S. Soccer. Production Co.: Alkemy X. DP: Zak Mulligan.
 - [Celebrity](https://jordanfein.com/work/celebrity/): Editorial / Celebrity. Director: Jordan Fein. Publications: People, Entertainment Weekly, InStyle, Travel + Leisure.
 - [Chevy](https://jordanfein.com/work/chevy/): Commercial / Automotive. Director: Jordan Fein. Production Co.: Cap Gun. DP: Hunter Robert Baker. Editor: Cavan Faucett. Colorist: Carlos Flores.
 - [Land Rover](https://jordanfein.com/work/land-rover/): Commercial / Real People / Automotive. Director: Jordan Fein. Client: Land Rover. Production Co.: Bows and Arrows. DP: Hunter Robert Baker.
-- [Formula 1](https://jordanfein.com/work/formula-1/): Commercial / Editorial / Celebrity / Automotive. Director: Jordan Fein. Client: Formula 1. Production Co.: QP Productions. Producer: Nicco Quiñones. Featuring: John-Michael Triana.
+- [Formula 1](https://jordanfein.com/work/formula-1/): Commercial / Editorial / Celebrity / Automotive / Sports. Director: Jordan Fein. Client: Formula 1. Production Co.: QP Productions. Producer: Nicco Quiñones. Featuring: John-Michael Triana.
 - [The Blessing](https://jordanfein.com/work/the-blessing/): Real People. Director: Jordan Fein, Hunter Robert Baker. Broadcast: PBS, WORLD, NHK Japan. DP: Hunter Robert Baker. Editor: Ricardo Acosta, Brett Banks, Lance Edmands, Jordan Fein. Awards: Best Coverage Of Native America / National Native Media Awards (The Native American Journalists Association); Grand Jury Prize / Dallas International Film Festival; Best Feature Real People / Arizona International Film Festival; Best Of Fest / Minneapolis St Paul International Film Festival; Best Native Feature Film / Bend Film Festival; Big Sky Award / Big Sky Real People Film Festival.
 - [PointCard](https://jordanfein.com/work/pointcard/): Commercial / Real People. Director: Jordan Fein. Client: PointCard. Production Co.: Alkemy X. DP: Sean Price Williams. Featuring: Girl Named Golden.
 - [Volvo](https://jordanfein.com/work/volvo/): Commercial / Automotive. Director: Jordan Fein, Hunter Robert Baker, Bob Partington. Client: Volvo. Agency: Grey. Production Co.: 1stAveMachine. Awards: Clio, Cannes Lions, One Show.
-- [Penn State Health](https://jordanfein.com/work/penn-state-health/): Commercial / Health. Director: Jordan Fein. Production Co.: Alkemy X. DP: Zach Lowry.
+- [Penn State Health](https://jordanfein.com/work/penn-state-health/): Commercial / Health / Sports. Director: Jordan Fein. Production Co.: Alkemy X. DP: Zach Lowry.
 - [Novant](https://jordanfein.com/work/novant/): Commercial / Health. Director: Jordan Fein. Production Co.: Hone. DP: Hunter Robert Baker. Colorist: Carlos Flores.
 - [Verizon](https://jordanfein.com/work/verizon/): Commercial. Director: Jordan Fein & Hunter Robert Baker. Production Co.: Alkemy X. DP: Hunter Robert Baker.
 - [Squarespace](https://jordanfein.com/work/squarespace/): Commercial / Real People. Director: Jordan Fein. Production Co.: 1stAveMachine. DP: Hunter Robert Baker.
@@ -66,8 +66,8 @@
 - [I Survived](https://jordanfein.com/work/i-survived/): Real People / Editorial. Director: Jordan Fein. Client: People Magazine. Featuring: Kimberly Corban, Michael Rourke. DP: Hunter Robert Baker.
 - [Kat Dennings](https://jordanfein.com/work/kat-dennings/): Editorial / Celebrity. Director: Jordan Fein. Client: People Magazine. DP: Fidel Ruiz-Healy.
 - [I Survived 9/11](https://jordanfein.com/work/i-survived-9-11/): Real People / Editorial. Director: Jordan Fein. Client: People Magazine. DP: Dave Russo.
-- [Carlos Sainz](https://jordanfein.com/work/carlos-sainz/): Editorial / Celebrity. Director: Jordan Fein.
-- [Formula 1 Drivers](https://jordanfein.com/work/formula-1-drivers/): Editorial / Celebrity. Director: Jordan Fein.
+- [Carlos Sainz](https://jordanfein.com/work/carlos-sainz/): Editorial / Celebrity / Sports. Director: Jordan Fein.
+- [Formula 1 Drivers](https://jordanfein.com/work/formula-1-drivers/): Editorial / Celebrity / Sports. Director: Jordan Fein.
 - [Matt Damon + Casey Affleck](https://jordanfein.com/work/matt-damon-casey-affleck/): Editorial / Celebrity. Director: Jordan Fein.
 - [Jackie Chan](https://jordanfein.com/work/jackie-chan/): Editorial / Celebrity. Director: Jordan Fein.
 - [Ralph Fiennes](https://jordanfein.com/work/ralph-fiennes/): Editorial / Celebrity. Director: Jordan Fein.
@@ -80,7 +80,7 @@
 - [Keanu Reeves, Keke Palmer, Seth Rogen & Aziz Ansari](https://jordanfein.com/work/keanu-reeves-keke-palmer-seth-rogen-and-aziz-ansari/): Editorial / Celebrity. Director: Jordan Fein.
 - [ScienceU](https://jordanfein.com/work/scienceu/): Commercial / Health. Director: Jordan Fein.
 - [Peace, Steve (Documentary Short)](https://jordanfein.com/work/peace-steve-documentary-short/): Real People / Health. Director: Jordan Fein. DP: Sam Wolff.
-- [PennState Health - Hockey](https://jordanfein.com/work/pennstate-health-hockey/): Commercial / Real People / Health. Director: Jordan Fein.
+- [PennState Health - Hockey](https://jordanfein.com/work/pennstate-health-hockey/): Commercial / Real People / Health / Sports. Director: Jordan Fein.
 - [PennState Health - Woods](https://jordanfein.com/work/pennstate-health-woods/): Commercial / Real People / Health. Director: Jordan Fein.
 - [UC Davis - Dance](https://jordanfein.com/work/uc-davis-dance/): Commercial / Real People / Health. Director: Jordan Fein.
 - [Detect the SOS](https://jordanfein.com/work/detect-the-sos/): Commercial / Health / Celebrity. Director: Jordan Fein. Production Co.: Impressionista Films. DP: Maz Makhani.
